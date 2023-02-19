@@ -11,12 +11,11 @@ namespace hundun.idleshare.enginecore
 {
     public abstract class BaseIdleGame<T_GAME, T_SAVE> : BaseHundunGame<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
     {
-        public AbstractIdleScreenContext<T_GAME, T_SAVE> screenContext { get; protected set; }
         public AudioPlayManager<T_GAME, T_SAVE> audioPlayManager { get; protected set; }
-        protected AbstractTextureManager textureManager;
+        public AbstractTextureManager textureManager;
 
-        protected IdleGameplayExport idleGameplayExport;
-        protected ChildGameConfig childGameConfig;
+        public IdleGameplayExport idleGameplayExport;
+        public ChildGameConfig childGameConfig;
 
 
         public BaseIdleGame(int viewportWidth, int viewportHeight) : base(viewportWidth, viewportHeight)
@@ -26,7 +25,6 @@ namespace hundun.idleshare.enginecore
         override protected void createStage2()
         {
             textureManager.lazyInitOnGameCreateStage2();
-            screenContext.lazyInit();
         }
 
         override protected void createStage3()

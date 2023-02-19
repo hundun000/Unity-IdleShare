@@ -9,14 +9,14 @@ namespace hundun.idleshare.enginecore
     public abstract class AbstractTextureManager
     {
 
-        
-        protected Sprite winTexture;
 
-        
-        protected Sprite menuTexture;
+        public Sprite winTexture;
 
-        
-        protected Sprite defaultBoardNinePatchTexture;
+
+        public Sprite menuTexture;
+
+
+        public Sprite defaultBoardNinePatchTexture;
 
 
         protected Dictionary<String, Sprite> resourceIconMap = new Dictionary<String, Sprite>();

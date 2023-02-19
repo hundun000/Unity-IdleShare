@@ -6,26 +6,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Burst.CompilerServices;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace hundun.idleshare.enginecore
 {
-    public abstract class AbstractMenuScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
+    public abstract class BaseIdleMenuScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
     {
-        private readonly String titleText;
-        private readonly OnTouchUp buttonContinueGameInputListener;
-        private readonly OnTouchUp buttonNewGameInputListener;
+        private String titleText;
+        private OnTouchUp buttonContinueGameInputListener;
+        private OnTouchUp buttonNewGameInputListener;
 
-        public Text title;
-        public Button buttonContinueGame;
-        public Button buttonNewGame;
 
-        protected AbstractMenuScreen(T_GAME game,
+        protected GameObject UiRoot { get; private set; }
+
+
+        protected Text title;
+        protected Button buttonContinueGame;
+        protected Button buttonNewGame;
+        
+
+        virtual public void postMonoBehaviourInitialization(T_GAME game,
             String titleText,
             OnTouchUp buttonContinueGameInputListener,
             OnTouchUp buttonNewGameInputListener
-            ) : base(game)
+            )
         {
+            base.postMonoBehaviourInitialization(game);
+
             this.titleText = titleText;
             this.buttonContinueGameInputListener = buttonContinueGameInputListener;
             this.buttonNewGameInputListener = buttonNewGameInputListener;
@@ -33,6 +42,12 @@ namespace hundun.idleshare.enginecore
 
         override public void show()
         {
+            UiRoot = gameObject.transform.Find("_uiRoot").gameObject;
+
+            this.title = this.UiRoot.transform.Find("title").gameObject.GetComponent<Text>();
+            this.buttonContinueGame = this.UiRoot.transform.Find("buttonContinueGame").gameObject.GetComponent<Button>();
+            this.buttonNewGame = this.UiRoot.transform.Find("buttonNewGame").gameObject.GetComponent<Button>();
+
 
             title.text = JavaFeatureForGwt.stringFormat("[     %s     ]", titleText);
 
