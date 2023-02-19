@@ -24,21 +24,21 @@ namespace hundun.idleshare.enginecore
         TextButton clickEffectButton;
         Image background;
 
-        //void OnMouseEnter() 
-        //{
-        //    if (model != null)
-        //    {
-        //        parent.showAndUpdateGuideInfo(model);
-        //    }
-        //    parent.game.frontend.log(this.getClass().getSimpleName(), "exit event");
-        
-        //}
+        void OnMouseEnter()
+        {
+            if (model != null)
+            {
+                parent.showAndUpdateGuideInfo(model);
+            }
+            parent.game.frontend.log(this.getClass().getSimpleName(), "exit event");
+
+        }
 
 
-        //void OnMouseExit()
-        //{
-        //    parent.hideAndCleanGuideInfo();
-        //}
+        void OnMouseExit()
+        {
+            parent.hideAndCleanGuideInfo();
+        }
 
 
 

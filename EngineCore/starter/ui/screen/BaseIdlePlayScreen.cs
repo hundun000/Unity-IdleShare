@@ -23,6 +23,7 @@ namespace hundun.idleshare.enginecore
         protected IdleScreenBackgroundVM screenBackgroundVM;
         protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
         protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
+        protected PopupInfoBoard<T_GAME, T_SAVE> secondaryInfoBoard;
 
         public String area { get; private set; }
         private String startArea;
@@ -30,6 +31,13 @@ namespace hundun.idleshare.enginecore
         protected List<ILogicFrameListener> logicFrameListeners = new List<ILogicFrameListener>();
         protected List<IGameAreaChangeListener> gameAreaChangeListeners = new List<IGameAreaChangeListener>();
 
+        virtual protected void Awake()
+        {
+            Contrainer = this.gameObject;
+            PopoupRoot = this.transform.Find("_popupRoot").gameObject;
+            UiRoot = this.transform.Find("_uiRoot").gameObject;
+            Templates = this.transform.Find("_templates").gameObject;
+        }
 
         virtual public void postMonoBehaviourInitialization(T_GAME game, String startArea,
                 int LOGIC_FRAME_PER_SECOND
@@ -55,10 +63,7 @@ namespace hundun.idleshare.enginecore
 
         override public void show()
         {
-            Contrainer = this.gameObject;
-            PopoupRoot = this.transform.Find("_popupRoot").gameObject;
-            UiRoot = this.transform.Find("_uiRoot").gameObject;
-            Templates = this.transform.Find("_templates").gameObject;
+            
 
             lazyInitBackUiAndPopupUiContent();
 
@@ -97,12 +102,13 @@ namespace hundun.idleshare.enginecore
 
         internal void showAndUpdateGuideInfo(ConstructionExportData model)
         {
-            // TODO
+            secondaryInfoBoard.gameObject.SetActive(true);
+            secondaryInfoBoard.update(model);
         }
 
         internal void hideAndCleanGuideInfo()
         {
-            // TODO
+            secondaryInfoBoard.gameObject.SetActive(false);
         }
     }
 }
