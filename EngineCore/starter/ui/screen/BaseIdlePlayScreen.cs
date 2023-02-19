@@ -1,3 +1,4 @@
+using hundun.idleshare.gamelib;
 using hundun.unitygame.adapters;
 using hundun.unitygame.enginecorelib;
 using hundun.unitygame.gamelib;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace hundun.idleshare.enginecore
 {
-    public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
+    public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
 
 
@@ -19,6 +20,9 @@ namespace hundun.idleshare.enginecore
         protected GameObject UiRoot { get; private set; }
         protected GameObject Templates { get; private set; }
 
+        protected IdleScreenBackgroundVM screenBackgroundVM;
+        protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
+        protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
 
         public String area { get; private set; }
         private String startArea;
@@ -67,8 +71,15 @@ namespace hundun.idleshare.enginecore
             game.frontend.log(this.getClass().getSimpleName(), "show done");
         }
 
+        virtual protected void lazyInitLogicContext()
+        {
+            logicFrameListeners.Add(constructionControlBoardVM);
+            logicFrameListeners.Add(game.idleGameplayExport);
 
-        protected abstract void lazyInitLogicContext();
+            gameAreaChangeListeners.Add(screenBackgroundVM);
+            gameAreaChangeListeners.Add(constructionControlBoardVM);
+        }
+
 
         protected abstract void lazyInitUiRootContext();
 
@@ -84,7 +95,15 @@ namespace hundun.idleshare.enginecore
             }
         }
 
+        internal void showAndUpdateGuideInfo(ConstructionExportData model)
+        {
+            // TODO
+        }
 
+        internal void hideAndCleanGuideInfo()
+        {
+            // TODO
+        }
     }
 }
 

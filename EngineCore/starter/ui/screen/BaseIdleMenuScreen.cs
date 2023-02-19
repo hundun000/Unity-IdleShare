@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.Burst.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +16,8 @@ namespace hundun.idleshare.enginecore
     public abstract class BaseIdleMenuScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
     {
         private String titleText;
-        private OnTouchUp buttonContinueGameInputListener;
-        private OnTouchUp buttonNewGameInputListener;
+        private JRunable buttonContinueGameInputListener;
+        private JRunable buttonNewGameInputListener;
 
 
         protected GameObject UiRoot { get; private set; }
@@ -29,8 +30,8 @@ namespace hundun.idleshare.enginecore
 
         virtual public void postMonoBehaviourInitialization(T_GAME game,
             String titleText,
-            OnTouchUp buttonContinueGameInputListener,
-            OnTouchUp buttonNewGameInputListener
+            JRunable buttonContinueGameInputListener,
+            JRunable buttonNewGameInputListener
             )
         {
             base.postMonoBehaviourInitialization(game);

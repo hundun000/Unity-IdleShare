@@ -7,13 +7,14 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using hundun.unitygame.enginecorelib;
 using Unity.VisualScripting;
+using UnityEngine.UI;
 
 namespace hundun.idleshare.enginecore
 {
     public class StorageInfoBoardVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
 
-        private BackgroundVM backgroundVM;
+        private Image background;
         protected GameObject nodesRoot;
         protected GameObject nodePrefab;
 
@@ -33,7 +34,7 @@ namespace hundun.idleshare.enginecore
         //Label mainLabel;
         private void Start()
         {
-            this.backgroundVM = this.transform.Find("BackgroundVM").GetComponent<BackgroundVM>();
+            this.background = this.transform.Find("background").GetComponent<Image>();
             this.nodesRoot = this.transform.Find("_nodesRoot").gameObject;
             this.nodePrefab = this.transform.Find("_templates/nodePrefab").gameObject;
         }
@@ -46,7 +47,7 @@ namespace hundun.idleshare.enginecore
         public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent, List<String> shownOrders)
         {
             this.parent = parent;
-            backgroundVM.update(parent.game.textureManager.defaultBoardNinePatchTexture);
+            background.sprite = (parent.game.textureManager.defaultBoardNinePatchTexture);
 
             this.shownOrders = shownOrders;
         }
