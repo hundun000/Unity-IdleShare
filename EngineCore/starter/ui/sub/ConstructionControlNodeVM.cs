@@ -126,9 +126,10 @@ namespace hundun.idleshare.enginecore
                     initAsNormalStyle();
                 }
             }
+            update();
         }
 
-        public void onLogicFrame()
+        public void update()
         {
             // ------ update show-state ------
             if (model == null)

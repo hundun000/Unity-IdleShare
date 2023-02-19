@@ -1,3 +1,4 @@
+using Assets.Scripts.DemoGameCore.ui.sub;
 using hundun.idleshare.gamelib;
 using hundun.unitygame.adapters;
 using hundun.unitygame.enginecorelib;
@@ -23,8 +24,8 @@ namespace hundun.idleshare.enginecore
         protected IdleScreenBackgroundVM screenBackgroundVM;
         protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
         protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
-        protected PopupInfoBoard<T_GAME, T_SAVE> secondaryInfoBoard;
-
+        protected PopupInfoBoardVM<T_GAME, T_SAVE> popupInfoBoardVM;
+        protected GameAreaControlBoardVM<T_GAME, T_SAVE> gameAreaControlBoardVM;
         public String area { get; private set; }
         private String startArea;
 
@@ -37,6 +38,12 @@ namespace hundun.idleshare.enginecore
             PopoupRoot = this.transform.Find("_popupRoot").gameObject;
             UiRoot = this.transform.Find("_uiRoot").gameObject;
             Templates = this.transform.Find("_templates").gameObject;
+
+            this.screenBackgroundVM = this.Contrainer.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
+            this.storageInfoBoardVM = this.UiRoot.transform.Find("cell_0/StorageInfoBoardVM").gameObject.GetComponent<StorageInfoBoardVM<T_GAME, T_SAVE>>();
+            this.constructionControlBoardVM = this.UiRoot.transform.Find("cell_1/FixedConstructionControlBoardVM").gameObject.GetComponent<FixedConstructionControlBoardVM<T_GAME, T_SAVE>>();
+            this.gameAreaControlBoardVM = this.UiRoot.transform.Find("cell_2/GameAreaControlBoardVM").gameObject.GetComponent<GameAreaControlBoardVM<T_GAME, T_SAVE>>();
+            this.popupInfoBoardVM = this.PopoupRoot.transform.Find("PopupInfoBoardVM").gameObject.GetComponent<PopupInfoBoardVM<T_GAME, T_SAVE>>();
         }
 
         virtual public void postMonoBehaviourInitialization(T_GAME game, String startArea,
@@ -83,6 +90,7 @@ namespace hundun.idleshare.enginecore
 
             gameAreaChangeListeners.Add(screenBackgroundVM);
             gameAreaChangeListeners.Add(constructionControlBoardVM);
+            gameAreaChangeListeners.Add(gameAreaControlBoardVM);
         }
 
 
@@ -102,13 +110,13 @@ namespace hundun.idleshare.enginecore
 
         internal void showAndUpdateGuideInfo(ConstructionExportData model)
         {
-            secondaryInfoBoard.gameObject.SetActive(true);
-            secondaryInfoBoard.update(model);
+            popupInfoBoardVM.gameObject.SetActive(true);
+            popupInfoBoardVM.update(model);
         }
 
         internal void hideAndCleanGuideInfo()
         {
-            secondaryInfoBoard.gameObject.SetActive(false);
+            popupInfoBoardVM.gameObject.SetActive(false);
         }
     }
 }

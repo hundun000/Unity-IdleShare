@@ -27,7 +27,7 @@ namespace hundun.idleshare.enginecore
         }
         public void onLogicFrame()
         {
-            constructionControlNodes.ForEach(item => item.onLogicFrame());
+            constructionControlNodes.ForEach(item => item.update());
         }
 
         public void onGameAreaChange(String last, String current)

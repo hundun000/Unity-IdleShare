@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace hundun.idleshare.enginecore
 {
-    public class PopupInfoBoard<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
+    public class PopupInfoBoardVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
 
