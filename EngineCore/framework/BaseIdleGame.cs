@@ -29,6 +29,7 @@ namespace hundun.idleshare.enginecore
 
         override protected void createStage3()
         {
+            this.saveHandler.registerSubHandler(idleGameplayExport);
 
             //managerContext.lazyInitOnGameCreate(childGameConfig);
             audioPlayManager.lazyInit(childGameConfig.screenIdToFilePathMap);

@@ -6,6 +6,7 @@ using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using hundun.unitygame.enginecorelib;
+using Unity.VisualScripting;
 
 namespace hundun.idleshare.enginecore
 {
@@ -13,6 +14,8 @@ namespace hundun.idleshare.enginecore
     {
 
         private BackgroundVM backgroundVM;
+        protected GameObject nodesRoot;
+        protected GameObject nodePrefab;
 
         private static int NODE_HEIGHT = 25;
         private static int NODE_WIDTH = 120;
@@ -23,46 +26,49 @@ namespace hundun.idleshare.enginecore
         HashSet<String> shownTypes = new HashSet<String>();
         BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
 
-        List<ResourceAmountPairNode<T_GAME, T_SAVE>> nodes = new List<ResourceAmountPairNode<T_GAME, T_SAVE>>();
+        List<ResourceAmountPairNode> nodes = new List<ResourceAmountPairNode>();
 
-        public void lazyInit(List<String> shownOrders)
-        {
-            this.shownOrders = shownOrders;
-            rebuildCells();
-        }
+
 
         //Label mainLabel;
+        private void Start()
+        {
+            this.backgroundVM = this.transform.Find("BackgroundVM").GetComponent<BackgroundVM>();
+            this.nodesRoot = this.transform.Find("_nodesRoot").gameObject;
+            this.nodePrefab = this.transform.Find("_templates/nodePrefab").gameObject;
+        }
 
+        private void Update()
+        {
+            updateViewData();
+        }
 
-        public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent)
+        public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent, List<String> shownOrders)
         {
             this.parent = parent;
             backgroundVM.update(parent.game.textureManager.defaultBoardNinePatchTexture);
 
+            this.shownOrders = shownOrders;
         }
 
 
 
         private void rebuildCells()
         {
-            //this.clearChildren();
-            //nodes.clear();
+            nodesRoot.transform.AsTableClear();
+            nodes.Clear();
 
-            //for (int i = 0; i < shownOrders.size(); i++)
-            //{
-            //    String resourceType = shownOrders.get(i);
-            //    if (shownTypes.contains(resourceType))
-            //    {
-            //        ResourceAmountPairNode<T_GAME> node = new ResourceAmountPairNode<>(parent.getGame(), resourceType);
-            //        nodes.add(node);
-            //        shownTypes.add(resourceType);
-            //        Cell<ResourceAmountPairNode<T_GAME>> cell = this.add(node).width(NODE_WIDTH).height(NODE_HEIGHT);
-            //        if ((i + 1) % NUM_NODE_PER_ROW == 0)
-            //        {
-            //            cell.row();
-            //        }
-            //    }
-            //}
+            for (int i = 0; i < shownOrders.size(); i++)
+            {
+                String resourceType = shownOrders.get(i);
+                if (shownTypes.Contains(resourceType))
+                {
+                    ResourceAmountPairNode node = nodesRoot.transform.AsTableAdd<ResourceAmountPairNode>(nodePrefab);
+                    node.postPrefabInitialization(parent.game.textureManager, resourceType);
+                    nodes.Add(node);
+                    shownTypes.Add(resourceType);
+                }
+            }
 
         }
 
@@ -70,26 +76,18 @@ namespace hundun.idleshare.enginecore
 
         public void updateViewData()
         {
-            //        List<ResourceType> shownResources = areaShownResources.get(parent.getArea());
-            //        if (shownResources == null) {
-            //            mainLabel.setText("Unkonwn area");
-            //            return;
-            //        }
-
-            //        String text = shownResources.stream()
-            //                .map(shownResource -> parent.game.getModelContext().getStorageManager().getResourceDescription(shownResource))
-            //                .collect(Collectors.joining("    "));
-            //        text += "\nBuffs = " + parent.game.getModelContext().getBuffManager().getBuffAmounts();
-            //        mainLabel.setText(text);
-            //boolean needRebuildCells = !shownTypes.equals(parent.getGame().getIdleGameplayExport().getUnlockedResourceTypes());
-            //if (needRebuildCells)
-            //{
-            //    shownTypes.clear();
-            //    shownTypes.addAll(parent.getGame().getIdleGameplayExport().getUnlockedResourceTypes());
-            //    rebuildCells();
-            //}
-            //nodes.stream().forEach(node->node.update(parent.getGame().getIdleGameplayExport().getResourceNumOrZero(node.getResourceType())));
+            Boolean needRebuildCells = !shownTypes.Equals(parent.game.idleGameplayExport.getUnlockedResourceTypes());
+            if (needRebuildCells)
+            {
+                shownTypes.Clear();
+                shownTypes.AddRange(parent.game.idleGameplayExport.getUnlockedResourceTypes());
+                rebuildCells();
+            }
+            nodes.ForEach(
+                node => node.update(parent.game.idleGameplayExport.getResourceNumOrZero(node.getResourceType()))
+                );
         }
+
 
 
     }
