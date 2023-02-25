@@ -25,7 +25,10 @@ namespace hundun.idleshare.enginecore
         protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
         protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
         protected PopupInfoBoardVM<T_GAME, T_SAVE> popupInfoBoardVM;
+        protected GameImageDrawer<T_GAME, T_SAVE> gameImageDrawer;
         protected GameAreaControlBoardVM<T_GAME, T_SAVE> gameAreaControlBoardVM;
+        public GameEntityManager<T_GAME, T_SAVE> gameEntityManager { get; protected set; }
+
         public String area { get; private set; }
         private String startArea;
 
@@ -70,7 +73,7 @@ namespace hundun.idleshare.enginecore
 
         override public void show()
         {
-            
+
 
             lazyInitBackUiAndPopupUiContent();
 
@@ -85,6 +88,13 @@ namespace hundun.idleshare.enginecore
 
         virtual protected void lazyInitLogicContext()
         {
+            this.gameImageDrawer = new GameImageDrawer<T_GAME, T_SAVE>();
+            this.gameEntityManager = new GameEntityManager<T_GAME, T_SAVE>();
+            gameEntityManager.lazyInit(this.game, 
+                game.childGameConfig.areaShowEntityByOwnAmountConstructionIds, 
+                game.childGameConfig.areaShowEntityByOwnAmountResourceIds, 
+                game.childGameConfig.areaShowEntityByChangeAmountResourceIds);
+
             logicFrameListeners.Add(constructionControlBoardVM);
             logicFrameListeners.Add(game.idleGameplayExport);
 
@@ -118,7 +128,13 @@ namespace hundun.idleshare.enginecore
         {
             popupInfoBoardVM.gameObject.SetActive(false);
         }
+
+        override protected void gameObjectDraw(float delta)
+        {
+            gameImageDrawer.allEntitiesMoveForFrameAndDraw();
+        }
     }
+
 }
 
 
