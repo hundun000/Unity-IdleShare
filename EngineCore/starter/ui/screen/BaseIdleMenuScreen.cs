@@ -21,6 +21,7 @@ namespace hundun.idleshare.enginecore
 
 
         protected GameObject UiRoot { get; private set; }
+        protected AudioSource audioSource;
 
         private IdleScreenBackgroundVM screenBackgroundVM;
         protected Text title;
@@ -41,7 +42,9 @@ namespace hundun.idleshare.enginecore
 
         void Awake()
         {
-            UiRoot = gameObject.transform.Find("_uiRoot").gameObject;
+            UiRoot = gameObject.transform.Find("_uiRoot").gameObject; 
+            audioSource = this.transform.Find("_audioSource").GetComponent<AudioSource>();
+
             this.title = this.UiRoot.transform.Find("title").gameObject.GetComponent<Text>();
             this.buttonContinueGame = this.UiRoot.transform.Find("buttonContinueGame").gameObject.GetComponent<Button>();
             this.buttonNewGame = this.UiRoot.transform.Find("buttonNewGame").gameObject.GetComponent<Button>();
@@ -80,6 +83,9 @@ namespace hundun.idleshare.enginecore
                 memuScreenTexts.get(4),
                 it => game.idleGameplayExport.language = it
                 );
+
+            // unity adapter
+            game.audioPlayManager.intoScreen(audioSource, this.getClass().getSimpleName());
         }
     }
 }

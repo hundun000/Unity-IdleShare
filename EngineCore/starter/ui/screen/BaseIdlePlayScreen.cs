@@ -1,3 +1,4 @@
+using Assets.Scripts.DemoGameCore.ui.screen;
 using Assets.Scripts.DemoGameCore.ui.sub;
 using hundun.idleshare.gamelib;
 using hundun.unitygame.adapters;
@@ -19,6 +20,8 @@ namespace hundun.idleshare.enginecore
         protected GameObject PopoupRoot { get; private set; }
         protected GameObject UiRoot { get; private set; }
         protected GameObject Templates { get; private set; }
+        protected AudioSource audioSource;
+
         // ----- ui ------
         protected IdleScreenBackgroundVM screenBackgroundVM;
         protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
@@ -44,6 +47,7 @@ namespace hundun.idleshare.enginecore
             PopoupRoot = this.transform.Find("_popupRoot").gameObject;
             UiRoot = this.transform.Find("_uiRoot").gameObject;
             Templates = this.transform.Find("_templates").gameObject;
+            audioSource = this.transform.Find("_audioSource").GetComponent<AudioSource>();
 
             this.screenBackgroundVM = this.Contrainer.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
             this.storageInfoBoardVM = this.UiRoot.transform.Find("cell_0/StorageInfoBoardVM").gameObject.GetComponent<StorageInfoBoardVM<T_GAME, T_SAVE>>();
@@ -89,6 +93,9 @@ namespace hundun.idleshare.enginecore
             // start area
             setAreaAndNotifyChildren(startArea);
             game.frontend.log(this.getClass().getSimpleName(), "show done");
+
+            // unity adapter
+            game.audioPlayManager.intoScreen(audioSource, this.getClass().getSimpleName());
         }
 
         virtual protected void lazyInitLogicContext()

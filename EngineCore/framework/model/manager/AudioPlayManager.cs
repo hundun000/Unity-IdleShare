@@ -12,7 +12,7 @@ namespace hundun.idleshare.enginecore
     public class AudioPlayManager<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
     {
         // need Mono set
-        public AudioSource music;
+        private AudioSource music;
 
         AudioClip currentBgmSound;
 
@@ -24,21 +24,26 @@ namespace hundun.idleshare.enginecore
             this.game = game;
         }
 
-        public void lazyInit(Dictionary<String, String> screenIdToFilePathMap) {
+        public void intoScreen(AudioSource music, String screenId)
+        {
+            this.music = music;
+            if (screenIdToSoundMap.containsKey(screenId))
+            {
+                setScreenBgm(screenIdToSoundMap.get(screenId));
+            }
+        }
+
+        public void lazyInitOnGameCreate(Dictionary<String, String> screenIdToFilePathMap) {
             if (screenIdToFilePathMap != null) {
                 foreach (var entry in screenIdToFilePathMap)
                 {
                     var k = entry.Key;
                     var v = entry.Value;
-                    screenIdToSoundMap.put(k, (AudioClip)Resources.Load(v));
+                    v = v.Replace(".mp3", "");
+                    v = v.Replace(".wav", "");
+                    var resource = (AudioClip)Resources.Load("game/" + v);
+                    screenIdToSoundMap.put(k, resource);
                 }
-            }
-        }
-
-
-        public void intoScreen(String screenId) {
-            if (screenIdToSoundMap.containsKey(screenId)) {
-                setScreenBgm(screenIdToSoundMap.get(screenId));
             }
         }
 

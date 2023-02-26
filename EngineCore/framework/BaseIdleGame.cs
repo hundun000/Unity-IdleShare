@@ -31,7 +31,7 @@ namespace hundun.idleshare.enginecore
         {
 
             //managerContext.lazyInitOnGameCreate(childGameConfig);
-            audioPlayManager.lazyInit(childGameConfig.screenIdToFilePathMap);
+            audioPlayManager.lazyInitOnGameCreate(childGameConfig.screenIdToFilePathMap);
 
         }
 
