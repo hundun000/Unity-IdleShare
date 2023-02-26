@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Unity.VisualScripting.Icons;
 
 namespace hundun.idleshare.gamelib
 {
@@ -11,7 +12,7 @@ namespace hundun.idleshare.gamelib
         String constructionIdToShowName(Language language, String constructionId);
         String constructionIdToDetailDescroptionConstPart(Language language, String constructionId);
         List<String> getMemuScreenTexts(Language language);
-        String language(Language it);
-        Language unLanguage(String it);
+
+        Dictionary<Language, String> getLanguageShowNameMap();
     }
 }

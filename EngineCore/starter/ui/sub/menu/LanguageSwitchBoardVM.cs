@@ -18,7 +18,7 @@ namespace hundun.idleshare.enginecore
         Dropdown selectBox;
         Text label;
         Text restartHintLabel;
-
+        private Dictionary<Language, string> languageShowNameMap;
 
         void Awake()
         {
@@ -37,16 +37,17 @@ namespace hundun.idleshare.enginecore
         {
             this.parent = parent;
             this.GetComponent<Image>().sprite = (parent.game.textureManager.defaultBoardNinePatchTexture);
-
+            this.languageShowNameMap = parent.game.idleGameplayExport.gameDictionary.getLanguageShowNameMap();
 
             selectBox.options = values
-                .Select(it => new Dropdown.OptionData(parent.game.idleGameplayExport.gameDictionary.language(it)))
+                .Select(it => new Dropdown.OptionData(languageShowNameMap.get(it)))
                 .ToList();
-            selectBox.value = selectBox.options.FindIndex(0, it => it.text.Equals(parent.game.idleGameplayExport.gameDictionary.language(current)));
+            selectBox.value = selectBox.options.FindIndex(0, it => it.text.Equals(languageShowNameMap.get(current)));
             selectBox.onValueChanged.AddListener(it =>
             {
                 restartHintLabel.gameObject.SetActive(true);
-                onSelect.Invoke(parent.game.idleGameplayExport.gameDictionary.unLanguage(selectBox.options[it].text));
+                Language language = languageShowNameMap.FirstOrDefault(x => x.Value == selectBox.options[it].text).Key;
+                onSelect.Invoke(language);
             });
 
             this.label.text = startText;
