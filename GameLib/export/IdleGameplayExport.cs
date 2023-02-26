@@ -73,6 +73,8 @@ namespace hundun.idleshare.gamelib
         private IdleGameplayContext gameplayContext;
         private IBuiltinConstructionsLoader builtinConstructionsLoader;
         private ChildGameConfig childGameConfig;
+        public IGameDictionary gameDictionary;
+        public Language language;
 
         public IdleGameplayExport(
                 IFrontend frontEnd,
@@ -80,6 +82,7 @@ namespace hundun.idleshare.gamelib
                 IBuiltinConstructionsLoader builtinConstructionsLoader,
                 int LOGIC_FRAME_PER_SECOND, ChildGameConfig childGameConfig)
         {
+            this.gameDictionary = gameDictionary;
             this.childGameConfig = childGameConfig;
             this.builtinConstructionsLoader = builtinConstructionsLoader;
             this.gameplayContext = new IdleGameplayContext(frontEnd, gameDictionary, LOGIC_FRAME_PER_SECOND);
@@ -175,6 +178,7 @@ namespace hundun.idleshare.gamelib
 
         public void applySystemSetting(SystemSettingSaveData systemSettingSave)
         {
+            this.language = (systemSettingSave.language);
             gameplayContext.allLazyInit(
                     systemSettingSave.language,
                     childGameConfig,
@@ -185,7 +189,7 @@ namespace hundun.idleshare.gamelib
 
         public void currentSituationToSystemSetting(SystemSettingSaveData systemSettingSave)
         {
-            systemSettingSave.language = (gameplayContext.language);
+            systemSettingSave.language = (this.language);
         }
 
     }

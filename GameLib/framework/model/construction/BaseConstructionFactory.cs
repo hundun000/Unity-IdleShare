@@ -27,13 +27,13 @@ namespace hundun.idleshare.gamelib
             return constructions.Values.ToList();
         }
 
-        public void lazyInit(IdleGameplayContext gameContext, List<BaseConstruction> constructionsList)
+        public void lazyInit(IdleGameplayContext gameContext, Language language, List<BaseConstruction> constructionsList)
         {
             constructionsList.ForEach(item => this.constructions.Add(item.id, item));
             foreach (KeyValuePair<String, BaseConstruction> entry in constructions)
             {
                 var it = entry.Value;
-                it.lazyInitDescription(gameContext);
+                it.lazyInitDescription(gameContext, language);
                 gameContext.eventManager.registerListener(it);
             }
         }

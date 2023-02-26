@@ -12,8 +12,6 @@ namespace hundun.idleshare.gamelib
     {
         public readonly int LOGIC_FRAME_PER_SECOND;
 
-        public Language language;
-
         public readonly IFrontend frontend;
 
         public readonly EventManager eventManager;
@@ -45,8 +43,7 @@ namespace hundun.idleshare.gamelib
 
         public void allLazyInit(Language language, ChildGameConfig childGameConfig, List<BaseConstruction> constructions)
         {
-            this.language = language;
-            this.constructionFactory.lazyInit(this, constructions);
+            this.constructionFactory.lazyInit(this, language, constructions);
             this.constructionManager.lazyInit(childGameConfig.areaControlableConstructionIds);
             this.achievementManager.lazyInit(childGameConfig.achievementPrototypes);
         }

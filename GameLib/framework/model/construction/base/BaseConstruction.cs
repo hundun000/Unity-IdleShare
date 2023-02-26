@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Unity.VisualScripting.Icons;
 
 namespace hundun.idleshare.gamelib
 {
@@ -53,11 +54,12 @@ namespace hundun.idleshare.gamelib
         public LevelComponent levelComponent;
 
 
-        public void lazyInitDescription(IdleGameplayContext gameContext)
+        public void lazyInitDescription(IdleGameplayContext gameContext, Language language)
         {
             this.gameContext = gameContext;
 
-            this.name = gameContext.gameDictionary.constructionIdToShowName(this.id);
+            this.name = gameContext.gameDictionary.constructionIdToShowName(language, id);
+            this.detailDescroptionConstPart = gameContext.gameDictionary.constructionIdToDetailDescroptionConstPart(language, id);
 
             outputComponent.lazyInitDescription();
             upgradeComponent.lazyInitDescription();

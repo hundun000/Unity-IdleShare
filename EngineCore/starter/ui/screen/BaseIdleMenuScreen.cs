@@ -13,9 +13,8 @@ using UnityEngine.UI;
 
 namespace hundun.idleshare.enginecore
 {
-    public abstract class BaseIdleMenuScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseHundunGame<T_GAME, T_SAVE>
+    public abstract class BaseIdleMenuScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
-        private String titleText;
         private JRunable buttonContinueGameInputListener;
         private JRunable buttonNewGameInputListener;
 
@@ -29,14 +28,12 @@ namespace hundun.idleshare.enginecore
         
 
         virtual public void postMonoBehaviourInitialization(T_GAME game,
-            String titleText,
             JRunable buttonContinueGameInputListener,
             JRunable buttonNewGameInputListener
             )
         {
             base.postMonoBehaviourInitialization(game);
 
-            this.titleText = titleText;
             this.buttonContinueGameInputListener = buttonContinueGameInputListener;
             this.buttonNewGameInputListener = buttonNewGameInputListener;
         }
@@ -49,13 +46,14 @@ namespace hundun.idleshare.enginecore
             this.buttonContinueGame = this.UiRoot.transform.Find("buttonContinueGame").gameObject.GetComponent<Button>();
             this.buttonNewGame = this.UiRoot.transform.Find("buttonNewGame").gameObject.GetComponent<Button>();
 
+            List<String> memuScreenTexts = game.idleGameplayExport.gameDictionary.getMemuScreenTexts(game.idleGameplayExport.language);
 
-            title.text = JavaFeatureForGwt.stringFormat("[     %s     ]", titleText);
+            title.text = JavaFeatureForGwt.stringFormat("[     %s     ]", memuScreenTexts[0]);
 
-            buttonContinueGame.transform.Find("text").GetComponent<Text>().text = "Countine";
+            buttonContinueGame.transform.Find("text").GetComponent<Text>().text = memuScreenTexts[2];
             buttonContinueGame.onClick.AddListener(buttonContinueGameInputListener.Invoke);
 
-            buttonNewGame.transform.Find("text").GetComponent<Text>().text = "New";
+            buttonNewGame.transform.Find("text").GetComponent<Text>().text = memuScreenTexts[1];
             buttonNewGame.onClick.AddListener(buttonNewGameInputListener.Invoke);
 
             if (!game.saveHandler.gameHasSave())
