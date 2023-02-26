@@ -1,4 +1,5 @@
-﻿using hundun.unitygame.adapters;
+﻿using Assets.Scripts.DemoGameCore.logic;
+using hundun.unitygame.adapters;
 using hundun.unitygame.gamelib;
 using System;
 using System.Collections.Generic;
@@ -67,17 +68,21 @@ namespace hundun.idleshare.gamelib
 
     }
 
-    public class IdleGameplayExport : ILogicFrameListener, ISubGameplaySaveHandler<GameplaySaveData>
+    public class IdleGameplayExport : ILogicFrameListener, ISubGameplaySaveHandler<GameplaySaveData>, ISubSystemSettingSaveHandler<SystemSettingSaveData>
     {
         private IdleGameplayContext gameplayContext;
+        private IBuiltinConstructionsLoader builtinConstructionsLoader;
+        private ChildGameConfig childGameConfig;
 
         public IdleGameplayExport(
                 IFrontend frontEnd,
                 IGameDictionary gameDictionary,
-                BaseConstructionFactory constructionFactory,
+                IBuiltinConstructionsLoader builtinConstructionsLoader,
                 int LOGIC_FRAME_PER_SECOND, ChildGameConfig childGameConfig)
         {
-            this.gameplayContext = new IdleGameplayContext(frontEnd, gameDictionary, constructionFactory, LOGIC_FRAME_PER_SECOND, childGameConfig);
+            this.childGameConfig = childGameConfig;
+            this.builtinConstructionsLoader = builtinConstructionsLoader;
+            this.gameplayContext = new IdleGameplayContext(frontEnd, gameDictionary, LOGIC_FRAME_PER_SECOND);
         }
 
         public long getResourceNumOrZero(String resourceId)
@@ -167,5 +172,21 @@ namespace hundun.idleshare.gamelib
             gameplaySaveData.ownResoueces = (gameplayContext.storageManager.ownResoueces);
             gameplaySaveData.unlockedAchievementNames = (gameplayContext.achievementManager.unlockedAchievementNames);
         }
+
+        public void applySystemSetting(SystemSettingSaveData systemSettingSave)
+        {
+            gameplayContext.allLazyInit(
+                    systemSettingSave.language,
+                    childGameConfig,
+                    builtinConstructionsLoader.provide(systemSettingSave.language)
+                    );
+            gameplayContext.frontend.log(this.getClass().getSimpleName(), "applySystemSetting done");
+        }
+
+        public void currentSituationToSystemSetting(SystemSettingSaveData systemSettingSave)
+        {
+            systemSettingSave.language = (gameplayContext.language);
+        }
+
     }
 }

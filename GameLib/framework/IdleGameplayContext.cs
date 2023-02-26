@@ -12,7 +12,7 @@ namespace hundun.idleshare.gamelib
     {
         public readonly int LOGIC_FRAME_PER_SECOND;
 
-
+        public Language language;
 
         public readonly IFrontend frontend;
 
@@ -23,28 +23,32 @@ namespace hundun.idleshare.gamelib
         public readonly BaseConstructionFactory constructionFactory;
         public readonly ConstructionManager constructionManager;
         public readonly IGameDictionary gameDictionary;
-    
+        public readonly DescriptionPackageFactory descriptionPackageFactory;
         public IdleGameplayContext(
                 IFrontend frontEnd,
                 IGameDictionary gameDictionary,
-                BaseConstructionFactory constructionFactory,
-                int LOGIC_FRAME_PER_SECOND, ChildGameConfig childGameConfig)
-            {
-                this.LOGIC_FRAME_PER_SECOND = LOGIC_FRAME_PER_SECOND;
+                int LOGIC_FRAME_PER_SECOND)
+        {
+            this.LOGIC_FRAME_PER_SECOND = LOGIC_FRAME_PER_SECOND;
 
-                this.frontend = frontEnd;
+            this.frontend = frontEnd;
 
-                this.eventManager = new EventManager(this);
-                this.storageManager = new StorageManager(this);
-                this.buffManager = new BuffManager(this);
-                this.achievementManager = new AchievementManager(this);
-                this.constructionFactory = constructionFactory;
-                this.constructionManager = new ConstructionManager(this);
-                this.gameDictionary = gameDictionary;
+            this.eventManager = new EventManager(this);
+            this.storageManager = new StorageManager(this);
+            this.buffManager = new BuffManager(this);
+            this.achievementManager = new AchievementManager(this);
+            this.constructionFactory = new BaseConstructionFactory();
+            this.constructionManager = new ConstructionManager(this);
+            this.gameDictionary = gameDictionary;
 
-                this.constructionFactory.lazyInit(this);
-                this.constructionManager.lazyInit(childGameConfig.areaControlableConstructionIds);
-                this.achievementManager.lazyInit(childGameConfig.achievementPrototypes);
-            }
         }
+
+        public void allLazyInit(Language language, ChildGameConfig childGameConfig, List<BaseConstruction> constructions)
+        {
+            this.language = language;
+            this.constructionFactory.lazyInit(this, constructions);
+            this.constructionManager.lazyInit(childGameConfig.areaControlableConstructionIds);
+            this.achievementManager.lazyInit(childGameConfig.achievementPrototypes);
+        }
+    }
 }

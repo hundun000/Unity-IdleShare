@@ -18,25 +18,6 @@ namespace hundun.idleshare.gamelib
 
         public int maxDrawNum = DEFAULT_MAX_DRAW_NUM;
 
-        public static readonly DescriptionPackage WORKING_LEVEL_AUTO_DESCRIPTION_PACKAGE = new DescriptionPackage(
-            "AutoCost", "AutoGain", "UpgradeCost", "(max level)", "Upgrade",
-                ILevelDescroptionProviders.WORKING_LEVEL_IMP);
-
-        public static readonly DescriptionPackage MAX_LEVEL_AUTO_DESCRIPTION_PACKAGE = new DescriptionPackage(
-            "AutoCost", "AutoGain", "UpgradeCost", "(max level)", "Upgrade",
-                ILevelDescroptionProviders.ONLY_LEVEL_IMP);
-
-        public static readonly DescriptionPackage SELLING_DESCRIPTION_PACKAGE = new DescriptionPackage(
-            "Sell", "Gain", "UpgradeCost", "(max level)", "Upgrade",
-                ILevelDescroptionProviders.WORKING_LEVEL_IMP);
-        public static readonly DescriptionPackage GATHER_DESCRIPTION_PACKAGE = new DescriptionPackage(
-            "Pay", "Gain", null, "(max level)", "Gather",
-                ILevelDescroptionProviders.EMPTY_IMP);
-
-        public static readonly DescriptionPackage WIN_DESCRIPTION_PACKAGE = new DescriptionPackage(
-            null, null, "Pay", "(max level)", "Unlock",
-                ILevelDescroptionProviders.LOCK_IMP);
-
         protected Random random = new Random();
 
         public IdleGameplayContext gameContext;

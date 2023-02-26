@@ -70,10 +70,10 @@ namespace hundun.idleshare.gamelib
         {
             if (!canOutput())
             {
-                gameContext.frontend.log(this.id, "canOutput");
+                //gameContext.frontend.log(this.id, "canOutput");
                 return;
             }
-            gameContext.frontend.log(this.id, "AutoOutput");
+            //gameContext.frontend.log(this.id, "AutoOutput");
             if (outputComponent.hasCost())
             {
                 gameContext.storageManager.modifyAllResourceNum(outputComponent.outputCostPack.modifiedValues, false);

@@ -30,19 +30,7 @@ namespace hundun.idleshare.gamelib
 
     public delegate String ILevelDescroptionProvider(int level, int workingLevel, Boolean reachMaxLevel);
 
-    public class ILevelDescroptionProviders
-    {
-        public static ILevelDescroptionProvider EMPTY_IMP = (level, workingLevel, reachMaxLevel) => "" ;
-        public static ILevelDescroptionProvider ONLY_LEVEL_IMP = (level, workingLevel, reachMaxLevel) => {
-            return "lv." + level;
-        };
-        public static ILevelDescroptionProvider WORKING_LEVEL_IMP = (level, workingLevel, reachMaxLevel) => {
-            return workingLevel + "/" + level + (reachMaxLevel ? "(max)" : "");
-        };
-        public static ILevelDescroptionProvider LOCK_IMP = (level, workingLevel, reachMaxLevel) => {
-            return (reachMaxLevel ? "Unlocked" : "");
-        };
-    }
+
 
         
 

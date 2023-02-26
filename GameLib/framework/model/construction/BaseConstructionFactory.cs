@@ -12,16 +12,6 @@ namespace hundun.idleshare.gamelib
     {
         Dictionary<String, BaseConstruction> constructions = new Dictionary<String, BaseConstruction>();
 
-        public BaseConstructionFactory(List<BaseConstruction> constructions)
-        {
-            constructions.ForEach(item => register(item));
-        }
-
-        protected void register(BaseConstruction construction)
-        {
-            constructions.Add(construction.id, construction);
-        }
-
         public BaseConstruction getConstruction(String id)
         {
             BaseConstruction result = constructions[id];
@@ -37,8 +27,9 @@ namespace hundun.idleshare.gamelib
             return constructions.Values.ToList();
         }
 
-        public void lazyInit(IdleGameplayContext gameContext)
+        public void lazyInit(IdleGameplayContext gameContext, List<BaseConstruction> constructionsList)
         {
+            constructionsList.ForEach(item => this.constructions.Add(item.id, item));
             foreach (KeyValuePair<String, BaseConstruction> entry in constructions)
             {
                 var it = entry.Value;
