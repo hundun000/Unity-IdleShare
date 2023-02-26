@@ -10,25 +10,28 @@ using UnityEngine;
 
 namespace hundun.idleshare.enginecore
 {
-    public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : BaseHundunScreen<T_GAME, T_SAVE> where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
+    public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : 
+        BaseHundunScreen<T_GAME, T_SAVE>, IAchievementUnlockCallback, ISecondaryInfoBoardCallback<ConstructionExportData> 
+        where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
-
-
-
-
+        // ----- unity adapter ------
         protected GameObject Contrainer { get; private set; }
         protected GameObject PopoupRoot { get; private set; }
         protected GameObject UiRoot { get; private set; }
         protected GameObject Templates { get; private set; }
-
+        // ----- ui ------
         protected IdleScreenBackgroundVM screenBackgroundVM;
         protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
         protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
-        protected PopupInfoBoardVM<T_GAME, T_SAVE> popupInfoBoardVM;
         protected GameImageDrawer<T_GAME, T_SAVE> gameImageDrawer;
         protected GameAreaControlBoardVM<T_GAME, T_SAVE> gameAreaControlBoardVM;
-        public GameEntityManager<T_GAME, T_SAVE> gameEntityManager { get; protected set; }
+        
+        // ----- popup ui ------
+        protected AchievementMaskBoard<T_GAME, T_SAVE> achievementMaskBoard;
+        protected PopupInfoBoardVM<T_GAME, T_SAVE> popupInfoBoardVM;
 
+        // ----- not ui ------
+        public GameEntityManager<T_GAME, T_SAVE> gameEntityManager { get; protected set; }
         public String area { get; private set; }
         private String startArea;
 
@@ -46,7 +49,9 @@ namespace hundun.idleshare.enginecore
             this.storageInfoBoardVM = this.UiRoot.transform.Find("cell_0/StorageInfoBoardVM").gameObject.GetComponent<StorageInfoBoardVM<T_GAME, T_SAVE>>();
             this.constructionControlBoardVM = this.UiRoot.transform.Find("cell_1/FixedConstructionControlBoardVM").gameObject.GetComponent<FixedConstructionControlBoardVM<T_GAME, T_SAVE>>();
             this.gameAreaControlBoardVM = this.UiRoot.transform.Find("cell_2/GameAreaControlBoardVM").gameObject.GetComponent<GameAreaControlBoardVM<T_GAME, T_SAVE>>();
+            
             this.popupInfoBoardVM = this.PopoupRoot.transform.Find("PopupInfoBoardVM").gameObject.GetComponent<PopupInfoBoardVM<T_GAME, T_SAVE>>();
+            this.achievementMaskBoard = this.PopoupRoot.transform.Find("AchievementMaskBoard").gameObject.GetComponent<AchievementMaskBoard<T_GAME, T_SAVE>>();
         }
 
         virtual public void postMonoBehaviourInitialization(T_GAME game, String startArea,
@@ -101,6 +106,9 @@ namespace hundun.idleshare.enginecore
             gameAreaChangeListeners.Add(screenBackgroundVM);
             gameAreaChangeListeners.Add(constructionControlBoardVM);
             gameAreaChangeListeners.Add(gameAreaControlBoardVM);
+
+            this.game.idleGameplayExport.eventManagerRegisterListener(this);
+            this.game.idleGameplayExport.eventManagerRegisterListener(gameImageDrawer);
         }
 
 
@@ -118,13 +126,13 @@ namespace hundun.idleshare.enginecore
             }
         }
 
-        internal void showAndUpdateGuideInfo(ConstructionExportData model)
+        public void showAndUpdateGuideInfo(ConstructionExportData model)
         {
             popupInfoBoardVM.gameObject.SetActive(true);
             popupInfoBoardVM.update(model);
         }
 
-        internal void hideAndCleanGuideInfo()
+        public void hideAndCleanGuideInfo()
         {
             popupInfoBoardVM.gameObject.SetActive(false);
         }
@@ -132,6 +140,19 @@ namespace hundun.idleshare.enginecore
         override protected void gameObjectDraw(float delta)
         {
             gameImageDrawer.allEntitiesMoveForFrameAndDraw();
+        }
+
+        public void hideAchievementMaskBoard()
+        {
+            game.frontend.log(this.getClass().getSimpleName(), "hideAchievementMaskBoard called");
+            achievementMaskBoard.gameObject.SetActive(false);
+        }
+
+        public void onAchievementUnlock(AchievementPrototype prototype)
+        {
+            game.frontend.log(this.getClass().getSimpleName(), "onAchievementUnlock called");
+            achievementMaskBoard.gameObject.SetActive(true);
+            achievementMaskBoard.setAchievementPrototype(prototype);
         }
     }
 

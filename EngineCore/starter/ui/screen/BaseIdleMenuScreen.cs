@@ -58,7 +58,7 @@ namespace hundun.idleshare.enginecore
             buttonNewGame.transform.Find("text").GetComponent<Text>().text = "New";
             buttonNewGame.onClick.AddListener(buttonNewGameInputListener.Invoke);
 
-            if (game.saveHandler.gameHasSave())
+            if (!game.saveHandler.gameHasSave())
             {
                 buttonContinueGame.gameObject.SetActive(false);
             } 

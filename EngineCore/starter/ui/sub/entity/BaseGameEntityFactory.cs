@@ -23,30 +23,27 @@ namespace hundun.idleshare.enginecore
 
         protected int COLUMN_STABLE_FIRST_COL_X = 80;
         protected int COLUMN_STABLE_COL_PADDING_X = 90;
-        protected int COLUMN_STABLE_FIRST_COL_Y = 250;
+        protected int COLUMN_STABLE_FIRST_COL_Y = 150;
         protected int COLUMN_STABLE_INDEX_PADDING_X = 0;
         protected int COLUMN_STABLE_INDEX_PADDING_Y = 30;
 
         protected int ROW_STABLE_FIRST_COL_X = 32;
         protected int ROW_STABLE_ROW_PADDING_Y = 100;
-        protected int ROW_STABLE_FIRST_COL_Y = 150;
+        protected int ROW_STABLE_FIRST_COL_Y = 50;
         protected int ROW_STABLE_INDEX_PADDING_X = 48;
         protected int ROW_STABLE_INDEX_PADDING_Y = 0;
 
         protected BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
 
-        private FailingEntity _failingEntityTempalte;
-        private FailingEntity failingEntityTempalte {
-            get { return _failingEntityTempalte; }
-            set {
-                _failingEntityTempalte = value;
-            } 
-        }
+        private FailingEntity failingEntityTempalte;
+        private GameEntity stableEntityTempalte;
+
         private Transform drawContaioner;
 
         void Awake()
         {
             this.failingEntityTempalte = this.transform.Find("_templates/FailingEntity").GetComponent<FailingEntity>();
+            this.stableEntityTempalte = this.transform.Find("_templates/GameEntity").GetComponent<GameEntity>();
         }
 
         virtual public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent, Transform drawContaioner)
@@ -133,7 +130,7 @@ namespace hundun.idleshare.enginecore
 
         protected GameEntity stableAnyEntity(Sprite sprite, int x, int y, double WIDTH_SCALE, double HEIGHT_SCALE, String constructionId)
         {
-            GameEntity entity = new GameEntity();
+            GameEntity entity = drawContaioner.AsTableAdd<GameEntity>(stableEntityTempalte.gameObject);
             entity.texture = (sprite);
             entity.x = (x);
             entity.y = (y);

@@ -35,5 +35,10 @@ namespace hundun.idleshare.enginecore
             audioPlayManager.lazyInit(childGameConfig.screenIdToFilePathMap);
 
         }
+
+        override public void dispose()
+        {
+            saveHandler.gameSaveCurrent();
+        }
     }
 }

@@ -111,7 +111,7 @@ namespace hundun.idleshare.gamelib
          */
         public void updateModifiedValues()
         {
-            gameContext.frontend.log(this.name, "updateCurrentCache called");
+            //gameContext.frontend.log(this.name, "updateCurrentCache called");
             // --------------
             Boolean reachMaxLevel = this.saveData.level == this.maxLevel;
             upgradeComponent.updateModifiedValues(reachMaxLevel);

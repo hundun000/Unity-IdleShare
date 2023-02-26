@@ -190,5 +190,17 @@ namespace hundun.idleshare.enginecore
             }
         }
 
+        public void destoryNoNeedDrawConstructionIds(List<string> needDrawConstructionIds)
+        {
+            foreach (KeyValuePair<String, List<GameEntity>> entry in gameEntitiesOfConstructionIds)
+            {
+                List<GameEntity> queue = entry.Value;
+                if (!needDrawConstructionIds.Contains(entry.Key))
+                {
+                    queue.ForEach(entity => UnityEngine.Object.Destroy(entity.gameObject));
+                    queue.Clear();
+                }
+            }
+        }
     }
 }

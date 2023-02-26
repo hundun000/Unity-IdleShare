@@ -21,8 +21,6 @@ namespace hundun.idleshare.enginecore
         public void lazyInit(BaseIdlePlayScreen<T_GAME, T_SAVE> parent, BaseGameEntityFactory<T_GAME, T_SAVE> gameEntityFactory)
         {
             this.parent = parent;
-
-            parent.game.idleGameplayExport.eventManagerRegisterListener(this);
             this.gameEntityFactory = gameEntityFactory;
         }
 
@@ -31,10 +29,13 @@ namespace hundun.idleshare.enginecore
         {
             GameEntityManager<T_GAME, T_SAVE> manager = parent.gameEntityManager;
 
-            manager.allEntityMoveForFrame();
+            
             String gameArea = parent.area;
 
             List<String> needDrawConstructionIds = manager.areaShowEntityByOwnAmountConstructionIds.get(gameArea);
+
+            manager.destoryNoNeedDrawConstructionIds(needDrawConstructionIds);
+            manager.allEntityMoveForFrame();
             if (needDrawConstructionIds != null)
             {
                 foreach (String id in needDrawConstructionIds)
