@@ -18,10 +18,6 @@ namespace hundun.idleshare.enginecore
         protected GameObject nodesRoot;
         protected GameObject nodePrefab;
 
-        private static int NODE_HEIGHT = 25;
-        private static int NODE_WIDTH = 120;
-
-        public static int NUM_NODE_PER_ROW = 5;
 
         List<String> shownOrders;
         HashSet<String> shownTypes = new HashSet<String>();

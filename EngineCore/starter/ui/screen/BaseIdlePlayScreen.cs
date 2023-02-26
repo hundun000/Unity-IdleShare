@@ -11,7 +11,7 @@ using UnityEngine;
 namespace hundun.idleshare.enginecore
 {
     public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : 
-        BaseHundunScreen<T_GAME, T_SAVE>, IAchievementUnlockCallback, ISecondaryInfoBoardCallback<ConstructionExportData> 
+        BaseHundunScreen<T_GAME, T_SAVE>, IAchievementUnlockCallback, ISecondaryInfoBoardCallback<ConstructionExportProxy> 
         where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         // ----- unity adapter ------
@@ -126,7 +126,7 @@ namespace hundun.idleshare.enginecore
             }
         }
 
-        public void showAndUpdateGuideInfo(ConstructionExportData model)
+        public void showAndUpdateGuideInfo(ConstructionExportProxy model)
         {
             popupInfoBoardVM.gameObject.SetActive(true);
             popupInfoBoardVM.update(model);

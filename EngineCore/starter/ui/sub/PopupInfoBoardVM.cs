@@ -44,7 +44,7 @@ namespace hundun.idleshare.enginecore
         }
 
 
-        private void rebuildCells(ConstructionExportData model)
+        private void rebuildCells(ConstructionExportProxy model)
         {
             childrenRoot.transform.AsTableClear();
 
@@ -92,7 +92,7 @@ namespace hundun.idleshare.enginecore
         }
 
 
-        public void update(ConstructionExportData model)
+        public void update(ConstructionExportProxy model)
         {
             rebuildCells(model);
         }

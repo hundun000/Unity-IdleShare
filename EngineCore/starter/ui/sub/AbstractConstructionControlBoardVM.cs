@@ -34,7 +34,7 @@ namespace hundun.idleshare.enginecore
         {
 
 
-            List<ConstructionExportData> newConstructions = parent.game.idleGameplayExport.getAreaShownConstructionsOrEmpty(current);
+            List<ConstructionExportProxy> newConstructions = parent.game.idleGameplayExport.getAreaShownConstructionsOrEmpty(current);
 
             int childrenSize = initChild(newConstructions.size());
 

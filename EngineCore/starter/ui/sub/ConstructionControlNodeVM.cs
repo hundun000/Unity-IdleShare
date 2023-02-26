@@ -14,7 +14,7 @@ namespace hundun.idleshare.enginecore
     public class ConstructionControlNodeVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
-        ConstructionExportData model;
+        ConstructionExportProxy model;
 
         Text constructionNameLabel;
         TextButton upWorkingLevelButton;
@@ -112,7 +112,7 @@ namespace hundun.idleshare.enginecore
 
         }
 
-        public void setModel(ConstructionExportData constructionExportData)
+        public void setModel(ConstructionExportProxy constructionExportData)
         {
             this.model = constructionExportData;
             if (constructionExportData != null)
