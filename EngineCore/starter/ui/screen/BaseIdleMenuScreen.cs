@@ -1,4 +1,5 @@
-﻿using hundun.unitygame.adapters;
+﻿using hundun.idleshare.gamelib;
+using hundun.unitygame.adapters;
 using hundun.unitygame.enginecorelib;
 using hundun.unitygame.gamelib;
 using System;
@@ -21,11 +22,11 @@ namespace hundun.idleshare.enginecore
 
         protected GameObject UiRoot { get; private set; }
 
-
+        private IdleScreenBackgroundVM screenBackgroundVM;
         protected Text title;
         protected Button buttonContinueGame;
         protected Button buttonNewGame;
-        
+        protected LanguageSwitchBoardVM<T_GAME, T_SAVE> languageSwitchBoardVM;
 
         virtual public void postMonoBehaviourInitialization(T_GAME game,
             JRunable buttonContinueGameInputListener,
@@ -33,19 +34,25 @@ namespace hundun.idleshare.enginecore
             )
         {
             base.postMonoBehaviourInitialization(game);
-
+            screenBackgroundVM.postPrefabInitialization(this.game.textureManager);
             this.buttonContinueGameInputListener = buttonContinueGameInputListener;
             this.buttonNewGameInputListener = buttonNewGameInputListener;
         }
 
-        override public void show()
+        void Awake()
         {
             UiRoot = gameObject.transform.Find("_uiRoot").gameObject;
-
             this.title = this.UiRoot.transform.Find("title").gameObject.GetComponent<Text>();
             this.buttonContinueGame = this.UiRoot.transform.Find("buttonContinueGame").gameObject.GetComponent<Button>();
             this.buttonNewGame = this.UiRoot.transform.Find("buttonNewGame").gameObject.GetComponent<Button>();
+            this.languageSwitchBoardVM = this.UiRoot.transform.Find("languageSwitchBoardVM").gameObject.GetComponent<LanguageSwitchBoardVM<T_GAME, T_SAVE>>();
+            this.screenBackgroundVM = gameObject.transform.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
 
+        }
+
+        override public void show()
+        {
+            
             List<String> memuScreenTexts = game.idleGameplayExport.gameDictionary.getMemuScreenTexts(game.idleGameplayExport.language);
 
             title.text = JavaFeatureForGwt.stringFormat("[     %s     ]", memuScreenTexts[0]);
@@ -56,7 +63,7 @@ namespace hundun.idleshare.enginecore
             buttonNewGame.transform.Find("text").GetComponent<Text>().text = memuScreenTexts[1];
             buttonNewGame.onClick.AddListener(buttonNewGameInputListener.Invoke);
 
-            if (!game.saveHandler.gameHasSave())
+            if (!game.saveHandler.hasContinuedGameplaySave())
             {
                 buttonContinueGame.gameObject.SetActive(false);
             } 
@@ -64,6 +71,15 @@ namespace hundun.idleshare.enginecore
             {
                 buttonContinueGame.gameObject.SetActive(true);
             }
+
+            languageSwitchBoardVM.postPrefabInitialization(
+                this,
+                Enum.GetValues(typeof(Language)).OfType<Language>().ToArray(),
+                game.idleGameplayExport.language,
+                memuScreenTexts.get(3),
+                memuScreenTexts.get(4),
+                it => game.idleGameplayExport.language = it
+                );
         }
     }
 }

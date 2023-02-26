@@ -11,5 +11,7 @@ namespace hundun.idleshare.gamelib
         String constructionIdToShowName(Language language, String constructionId);
         String constructionIdToDetailDescroptionConstPart(Language language, String constructionId);
         List<String> getMemuScreenTexts(Language language);
+        String language(Language it);
+        Language unLanguage(String it);
     }
 }

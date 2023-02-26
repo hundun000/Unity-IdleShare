@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 
+
 namespace hundun.idleshare.gamelib
 {
     public class ConstructionExportProxy
@@ -146,7 +147,7 @@ namespace hundun.idleshare.gamelib
             return model.levelComponent.canChangeWorkingLevel(delta);
         }
 
-        public void applyGameSaveData(GameplaySaveData gameplaySaveData)
+        public void applyGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
             List<BaseConstruction> constructions = gameplayContext.constructionFactory.getConstructions();
             foreach (BaseConstruction construction in constructions)
@@ -162,7 +163,7 @@ namespace hundun.idleshare.gamelib
             gameplayContext.achievementManager.unlockedAchievementNames = (gameplaySaveData.unlockedAchievementNames);
         }
 
-        public void currentSituationToSaveData(GameplaySaveData gameplaySaveData)
+        public void currentSituationToGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
             List<BaseConstruction> constructions = gameplayContext.constructionFactory.getConstructions();
             gameplaySaveData.constructionSaveDataMap = (constructions
