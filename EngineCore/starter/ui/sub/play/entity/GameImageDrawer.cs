@@ -32,15 +32,15 @@ namespace hundun.idleshare.enginecore
             
             String gameArea = parent.area;
 
-            List<String> needDrawConstructionIds = manager.areaShowEntityByOwnAmountConstructionIds.get(gameArea);
+            List<String> needDrawConstructionPrototypeIds = manager.areaShowEntityByOwnAmountConstructionPrototypeIds.get(gameArea);
 
-            manager.destoryNoNeedDrawConstructionIds(needDrawConstructionIds);
+            manager.destoryNoNeedDrawConstructionPrototypeIds(needDrawConstructionPrototypeIds);
             manager.allEntityMoveForFrame();
-            if (needDrawConstructionIds != null)
+            if (needDrawConstructionPrototypeIds != null)
             {
-                foreach (String id in needDrawConstructionIds)
+                foreach (String prototypeId in needDrawConstructionPrototypeIds)
                 {
-                    List<GameEntity> queue = manager.gameEntitiesOfConstructionIds.get(id);
+                    List<GameEntity> queue = manager.gameEntitiesOfConstructionPrototypeIds.get(prototypeId);
                     if (queue == null)
                     {
                         continue;

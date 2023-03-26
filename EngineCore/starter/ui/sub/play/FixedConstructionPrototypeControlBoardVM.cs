@@ -9,19 +9,19 @@ using UnityEngine.UI;
 
 namespace hundun.idleshare.enginecore
 {
-    public class FixedConstructionControlBoardVM<T_GAME, T_SAVE> : AbstractConstructionControlBoardVM<T_GAME, T_SAVE> where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
+    public class FixedConstructionPrototypeControlBoardVM<T_GAME, T_SAVE> : AbstractConstructionPrototypeControlBoardVM<T_GAME, T_SAVE> where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
-        public static int FIXED_NODE_NUM = 10;
+        public static int FIXED_NODE_NUM = 5;
 
         GameObject nodesRoot;
         Image background;
-        ConstructionControlNodeVM<T_GAME, T_SAVE> nodePrefab;
+        ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE> nodePrefab;
 
         void Awake()
         {
             this.background = this.transform.Find("background").GetComponent<Image>();
             this.nodesRoot = this.transform.Find("_nodesRoot").gameObject;
-            this.nodePrefab = this.transform.Find("_templates/nodePrefab").GetComponent<ConstructionControlNodeVM<T_GAME, T_SAVE>>();
+            this.nodePrefab = this.transform.Find("_templates/nodePrefab").GetComponent<ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE>>();
         }
 
         override public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent)
@@ -41,7 +41,7 @@ namespace hundun.idleshare.enginecore
 
             for (int i = 0; i < childrenSize; i++)
             {
-                ConstructionControlNodeVM<T_GAME, T_SAVE> constructionView = nodesRoot.transform.AsTableAdd<ConstructionControlNodeVM<T_GAME, T_SAVE>>(nodePrefab.gameObject);
+                ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE> constructionView = nodesRoot.transform.AsTableAdd<ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE>>(nodePrefab.gameObject);
                 constructionView.postPrefabInitialization(parent);
                 constructionControlNodes.Add(constructionView);
             }

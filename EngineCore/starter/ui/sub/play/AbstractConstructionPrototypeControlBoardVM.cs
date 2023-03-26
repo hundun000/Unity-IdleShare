@@ -10,17 +10,13 @@ using UnityEngine;
 
 namespace hundun.idleshare.enginecore
 {
-    public abstract class AbstractConstructionControlBoardVM<T_GAME, T_SAVE> : MonoBehaviour, 
-        ILogicFrameListener, 
-        IGameAreaChangeListener, 
-        IConstructionCollectionListener 
-        where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
+    public abstract class AbstractConstructionPrototypeControlBoardVM<T_GAME, T_SAVE> : MonoBehaviour, ILogicFrameListener, IGameAreaChangeListener where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         protected BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
         /**
          * 显示在当前screen的Construction集合。以ConstructionView形式存在。
          */
-        protected List<ConstructionControlNodeVM<T_GAME, T_SAVE>> constructionControlNodes = new List<ConstructionControlNodeVM<T_GAME, T_SAVE>>();
+        protected List<ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE>> constructionControlNodes = new List<ConstructionPrototypeControlNodeVM<T_GAME, T_SAVE>>();
 
 
 
@@ -33,10 +29,11 @@ namespace hundun.idleshare.enginecore
             constructionControlNodes.ForEach(item => item.update());
         }
 
-        public void onConstructionCollectionChange()
+        public void onGameAreaChange(String last, String current)
         {
-            List<BaseConstruction> newConstructions = parent.game.idleGameplayExport.getAreaShownConstructionsOrEmpty(parent.area);
-            newConstructions = filterConstructions(newConstructions);
+
+
+            List<AbstractConstructionPrototype> newConstructions = parent.game.idleGameplayExport.getAreaShownConstructionPrototypesOrEmpty(current);
 
             int childrenSize = initChild(newConstructions.size());
 
@@ -48,23 +45,10 @@ namespace hundun.idleshare.enginecore
             {
                 constructionControlNodes.get(i).setModel(null);
             }
-            parent.game.frontend.log("ConstructionInfoBorad", "Constructions change to: " + String.Join(",",
-                newConstructions.Select(construction => construction.name))
+            parent.game.frontend.log(this.getClass().getSimpleName(), "ConstructionPrototypes change to: " + String.Join(",", 
+                newConstructions.Select(construction => construction.prototypeId))
             );
-        }
 
-        /**
-         * 子类可添加筛选
-         */
-        virtual protected List<BaseConstruction> filterConstructions(List<BaseConstruction> constructions)
-        {
-            return constructions;
-        }
-
-
-        public void onGameAreaChange(String last, String current)
-        {
-            onConstructionCollectionChange();
         }
 
         /**

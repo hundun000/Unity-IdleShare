@@ -14,33 +14,31 @@ namespace hundun.idleshare.enginecore
     public class AchievementMaskBoard<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         BaseIdlePlayScreen<T_GAME, T_SAVE> parent;
-        Text label;
-        Button button;
-        Text buttonText;
+        Text congratulationLabel;
+        TextButton backTextButton;
         Image background;
 
         void Awake()
         {
             this.background = this.transform.Find("background").GetComponent<Image>();
-            this.label = this.transform.Find("label").GetComponent<Text>();
-            this.button = this.transform.Find("button").GetComponent<Button>();
-            this.buttonText = this.transform.Find("button/text").GetComponent<Text>();
+            this.congratulationLabel = this.transform.Find("congratulationLabel").GetComponent<Text>();
+            this.backTextButton = this.transform.Find("button").GetComponent<TextButton>();
         }
 
         public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent)
         {
             this.parent = parent;
-            this.background.sprite = parent.game.textureManager.winTexture;
+            this.background.sprite = parent.game.textureManager.achievementMaskBoardTexture;
 
-            this.buttonText.text = "OK";
-            this.button.onClick.AddListener(() => {
+            this.backTextButton.label.text = parent.game.idleGameplayExport.gameDictionary.getAchievementTexts(parent.game.idleGameplayExport.language)[2];
+            this.backTextButton.button.onClick.AddListener(() => {
                 parent.hideAchievementMaskBoard();
             });
 
         }
-        public void setAchievementPrototype(AchievementPrototype prototype)
+        public void setAchievementPrototype(AbstractAchievement prototype)
         {
-            label.text = prototype.description;
+            congratulationLabel.text = prototype.congratulationText;
         }
     }
 }

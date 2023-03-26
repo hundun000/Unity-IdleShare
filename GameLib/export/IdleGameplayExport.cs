@@ -11,68 +11,12 @@ using Unity.VisualScripting;
 
 namespace hundun.idleshare.gamelib
 {
-    public class ConstructionExportProxy
-    {
-        private BaseConstruction model;
-
-        public String id;
-        public String name;
-        public DescriptionPackage descriptionPackage;
-        public ResourcePack outputGainPack;
-        public ResourcePack outputCostPack;
-        public UpgradeState upgradeState;
-        public ResourcePack upgradeCostPack;
-        // ------- need runtime calculate ------
-        public String buttonDescroption { 
-            get 
-            {
-                return model.getButtonDescroption();
-            } 
-        }
-        public String workingLevelDescroption
-        {
-            get
-            {
-                return model.levelComponent.getWorkingLevelDescroption();
-            }
-        }
-        public String detailDescroptionConstPart
-        {
-            get
-            {
-                return model.detailDescroptionConstPart;
-            }
-        }
-
-        public Boolean workingLevelChangable
-        {
-            get
-            {
-                return model.levelComponent.workingLevelChangable;
-            }
-        }
-
-        public static ConstructionExportProxy fromModel(BaseConstruction model)
-        {
-            ConstructionExportProxy result = new ConstructionExportProxy();
-            result.model = model;
-            result.id = (model.id);
-            result.name = (model.name);
-            result.outputCostPack = (model.outputComponent.outputCostPack);
-            result.outputGainPack = (model.outputComponent.outputGainPack);
-            result.upgradeState = (model.upgradeComponent.upgradeState);
-            result.upgradeCostPack = (model.upgradeComponent.upgradeCostPack);
-            result.descriptionPackage = (model.descriptionPackage);
-            return result;
-        }
-
-
-    }
 
     public class IdleGameplayExport : ILogicFrameListener, ISubGameplaySaveHandler<GameplaySaveData>, ISubSystemSettingSaveHandler<SystemSettingSaveData>
     {
         private IdleGameplayContext gameplayContext;
         private IBuiltinConstructionsLoader builtinConstructionsLoader;
+        private IBuiltinAchievementsLoader builtinAchievementsLoader;
         private ChildGameConfig childGameConfig;
         public IGameDictionary gameDictionary;
         public Language language;
@@ -81,11 +25,13 @@ namespace hundun.idleshare.gamelib
                 IFrontend frontEnd,
                 IGameDictionary gameDictionary,
                 IBuiltinConstructionsLoader builtinConstructionsLoader,
+                IBuiltinAchievementsLoader builtinAchievementsLoader,
                 int LOGIC_FRAME_PER_SECOND, ChildGameConfig childGameConfig)
         {
             this.gameDictionary = gameDictionary;
             this.childGameConfig = childGameConfig;
             this.builtinConstructionsLoader = builtinConstructionsLoader;
+            this.builtinAchievementsLoader = builtinAchievementsLoader;
             this.gameplayContext = new IdleGameplayContext(frontEnd, gameDictionary, LOGIC_FRAME_PER_SECOND);
         }
 
@@ -94,9 +40,12 @@ namespace hundun.idleshare.gamelib
             return gameplayContext.storageManager.getResourceNumOrZero(resourceId);
         }
 
-        public BaseConstruction getConstruction(String id)
+
+        public List<BaseConstruction> getConstructionsOfPrototype(String prototypeId)
         {
-            return gameplayContext.constructionFactory.getConstruction(id);
+            return gameplayContext.constructionManager.getConstructionsOfPrototype(prototypeId)
+                
+                ;
         }
 
         public void onLogicFrame()
@@ -105,12 +54,17 @@ namespace hundun.idleshare.gamelib
             gameplayContext.storageManager.onSubLogicFrame();
         }
 
-        public List<ConstructionExportProxy> getAreaShownConstructionsOrEmpty(String current)
+        public List<BaseConstruction> getAreaShownConstructionsOrEmpty(String current)
         {
             return gameplayContext.constructionManager.getAreaShownConstructionsOrEmpty(current)
-                    .Select(it => ConstructionExportProxy.fromModel(it))
-                    .ToList();
                     ;
+        }
+
+        public List<AbstractConstructionPrototype> getAreaShownConstructionPrototypesOrEmpty(String current)
+        {
+            return gameplayContext.constructionManager.getAreaShownConstructionPrototypesOrEmpty(current)
+                    ;
+            ;
         }
 
         public void eventManagerRegisterListener(Object objecz)
@@ -125,47 +79,68 @@ namespace hundun.idleshare.gamelib
 
         public void constructionChangeWorkingLevel(String id, int delta)
         {
-            BaseConstruction model = gameplayContext.constructionFactory.getConstruction(id);
+            BaseConstruction model = gameplayContext.constructionManager.getConstruction(id);
             model.levelComponent.changeWorkingLevel(delta);
         }
 
         public void constructionOnClick(String id)
         {
-            BaseConstruction model = gameplayContext.constructionFactory.getConstruction(id);
+            BaseConstruction model = gameplayContext.constructionManager.getConstruction(id);
             model.onClick();
+        }
+
+        public BaseConstruction getConstructionAt(GridPosition position)
+        {
+            return gameplayContext.constructionManager.getConstructionAt(position);
         }
 
         public Boolean constructionCanClickEffect(String id)
         {
-            BaseConstruction model = gameplayContext.constructionFactory.getConstruction(id);
+            BaseConstruction model = gameplayContext.constructionManager.getConstruction(id);
             return model.canClickEffect();
         }
 
         public Boolean constructionCanChangeWorkingLevel(String id, int delta)
         {
-            BaseConstruction model = gameplayContext.constructionFactory.getConstruction(id);
+            BaseConstruction model = gameplayContext.constructionManager.getConstruction(id);
             return model.levelComponent.canChangeWorkingLevel(delta);
         }
 
+        public void destoryConstruction(String id, String constructionPrototypeIdOfEmpty)
+        {
+            gameplayContext.constructionManager.destoryInstanceAndNotify(id, constructionPrototypeIdOfEmpty);
+        }
+
+        internal AbstractConstructionPrototype previewPrototype(string prototypeId)
+        {
+            return gameplayContext.constructionFactory.getPrototype(prototypeId);
+        }
+
+        public void transformConstruction(String id)
+        {
+            gameplayContext.constructionManager.transformInstanceAndNotify(id);
+        }
+
+        public AchievementInfoPackage getAchievementInfoPackage()
+        {
+            return gameplayContext.achievementManager.getAchievementInfoPackage();
+        }
+
+
         public void applyGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
-            List<BaseConstruction> constructions = gameplayContext.constructionFactory.getConstructions();
-            foreach (BaseConstruction construction in constructions)
-            {
-                if (gameplaySaveData.constructionSaveDataMap.ContainsKey(construction.id))
-                {
-                    construction.saveData = (gameplaySaveData.constructionSaveDataMap.get(construction.id));
-                    construction.updateModifiedValues();
-                }
-            }
+            gameplaySaveData.constructionSaveDataMap.Values.ToList().ForEach(it => {
+                gameplayContext.constructionManager.loadInstance(it);
+            });
+
             gameplayContext.storageManager.unlockedResourceTypes = (gameplaySaveData.unlockedResourceTypes);
             gameplayContext.storageManager.ownResoueces = (gameplaySaveData.ownResoueces);
-            gameplayContext.achievementManager.unlockedAchievementNames = (gameplaySaveData.unlockedAchievementNames);
+            gameplayContext.achievementManager.unlockedAchievementIds = (gameplaySaveData.unlockedAchievementIds);
         }
 
         public void currentSituationToGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
-            List<BaseConstruction> constructions = gameplayContext.constructionFactory.getConstructions();
+            List<BaseConstruction> constructions = gameplayContext.constructionManager.getConstructions();
             gameplaySaveData.constructionSaveDataMap = (constructions
                     .ToDictionary(
                             it => it.id,
@@ -174,7 +149,7 @@ namespace hundun.idleshare.gamelib
                     );
             gameplaySaveData.unlockedResourceTypes = (gameplayContext.storageManager.unlockedResourceTypes);
             gameplaySaveData.ownResoueces = (gameplayContext.storageManager.ownResoueces);
-            gameplaySaveData.unlockedAchievementNames = (gameplayContext.achievementManager.unlockedAchievementNames);
+            gameplaySaveData.unlockedAchievementIds = (gameplayContext.achievementManager.unlockedAchievementIds);
         }
 
         public void applySystemSetting(SystemSettingSaveData systemSettingSave)
@@ -183,7 +158,8 @@ namespace hundun.idleshare.gamelib
             gameplayContext.allLazyInit(
                     systemSettingSave.language,
                     childGameConfig,
-                    builtinConstructionsLoader.provide(systemSettingSave.language)
+                    builtinConstructionsLoader.getProviderMap(language),
+                    builtinAchievementsLoader.getProviderMap(language)
                     );
             gameplayContext.frontend.log(this.getClass().getSimpleName(), "applySystemSetting done");
         }
@@ -193,5 +169,37 @@ namespace hundun.idleshare.gamelib
             systemSettingSave.language = (this.language);
         }
 
+
+        internal bool canBuyInstanceOfPrototype(string prototypeId, GridPosition position)
+        {
+            return gameplayContext.constructionManager.canBuyInstanceOfPrototype(prototypeId, position);
+        }
+        internal void buyInstanceOfPrototype(string prototypeId, GridPosition position)
+        {
+            gameplayContext.constructionManager.buyInstanceOfPrototype(prototypeId, position);
+            gameplayContext.eventManager.notifyConstructionCollectionChange();
+        }
+
+        internal GridPosition getConnectedRandonPosition()
+        {
+            if (gameplayContext.constructionManager.runningConstructionModelMap.Count == 0)
+            {
+                return new GridPosition(0, 0);
+            }
+            else
+            {
+                foreach (var construction in gameplayContext.constructionManager.runningConstructionModelMap.Values)
+                {
+                    foreach (var neighborEntry in construction.neighbors)
+                    {
+                        if (neighborEntry.Value == null)
+                        {
+                            return TileNodeUtils.tileNeighborPosition(construction, gameplayContext.constructionManager, neighborEntry.Key);
+                        }
+                    }
+                }
+            }
+            throw new Exception("getConnectedRandonPosition fail");
+        }
     }
 }

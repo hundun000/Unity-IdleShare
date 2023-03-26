@@ -32,7 +32,7 @@ namespace hundun.idleshare.gamelib
                 return false;
             }
             int next = construction.saveData.workingLevel + delta;
-            if (next > construction.saveData.level || next < 0)
+            if (next > construction.saveData.level || next < construction.minWorkingLevel)
             {
                 return false;
             }

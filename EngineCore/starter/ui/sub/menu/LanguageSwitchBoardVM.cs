@@ -1,5 +1,6 @@
 ﻿using hundun.idleshare.gamelib;
 using hundun.unitygame.adapters;
+using hundun.unitygame.enginecorelib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace hundun.idleshare.enginecore
 {
     public class LanguageSwitchBoardVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
-        BaseIdleMenuScreen<T_GAME, T_SAVE> parent;
+        BaseHundunScreen<T_GAME, T_SAVE> parent;
         Dropdown selectBox;
         Text label;
         Text restartHintLabel;
@@ -27,7 +28,7 @@ namespace hundun.idleshare.enginecore
             this.restartHintLabel = this.transform.Find("restartHintLabel").GetComponent<Text>();
         }
 
-        public void postPrefabInitialization(BaseIdleMenuScreen<T_GAME, T_SAVE> parent,
+        public void postPrefabInitialization(BaseHundunScreen<T_GAME, T_SAVE> parent,
                 Language[] values,
                 Language current,
                 String startText,

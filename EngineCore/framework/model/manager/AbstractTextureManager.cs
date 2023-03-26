@@ -10,7 +10,7 @@ namespace hundun.idleshare.enginecore
     {
 
 
-        public Sprite winTexture;
+        public Sprite achievementMaskBoardTexture;
 
 
         public Sprite menuTexture;

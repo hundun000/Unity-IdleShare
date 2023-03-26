@@ -10,7 +10,7 @@ namespace hundun.idleshare.gamelib
     {
         private readonly String buffId;
 
-        public BaseBuffConstruction(String id, String buffId) : base(id)
+        public BaseBuffConstruction(String prototypeId, String id, String buffId) : base(prototypeId, id)
         {
             this.buffId = buffId;
         }
@@ -43,12 +43,12 @@ namespace hundun.idleshare.gamelib
             return canUpgrade();
         }
 
-        public override long calculateModifiedOutput(long baseValue, int level)
+        public override long calculateModifiedOutput(long baseValue, int level, int proficiency)
         {
             throw new NotImplementedException();
         }
 
-        public override long calculateModifiedOutputCost(long baseValue, int level)
+        public override long calculateModifiedOutputCost(long baseValue, int level, int proficiency)
         {
             throw new NotImplementedException();
         }

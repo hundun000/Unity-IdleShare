@@ -44,7 +44,7 @@ namespace hundun.idleshare.enginecore
         }
 
 
-        private void rebuildCells(ConstructionExportProxy model)
+        private void rebuildCells(BaseConstruction model)
         {
             childrenRoot.transform.AsTableClear();
 
@@ -52,24 +52,34 @@ namespace hundun.idleshare.enginecore
             detailDescroptionConstPartText.text = model.detailDescroptionConstPart;
 
 
-            buildOnePack(model.outputCostPack);
+            buildOnePack(model.outputComponent.outputCostPack);
 
-            buildOnePack(model.outputGainPack);
+            buildOnePack(model.outputComponent.outputGainPack);
 
-            if (model.upgradeState == UpgradeState.HAS_NEXT_UPGRADE)
+            if (model.upgradeComponent.upgradeState == UpgradeState.HAS_NEXT_UPGRADE)
             {
-                buildOnePack(model.upgradeCostPack);
+                buildOnePack(model.upgradeComponent.upgradeCostPack);
             }
-            else if (model.upgradeState == UpgradeState.REACHED_MAX_UPGRADE)
+            else if (model.upgradeComponent.upgradeState == UpgradeState.REACHED_MAX_UPGRADE_HAS_TRANSFER)
+            {
+
+            }
+            else if (model.upgradeComponent.upgradeState == UpgradeState.REACHED_MAX_UPGRADE_HAS_TRANSFER)
             {
                 GameObject maxLevelGroup = childrenRoot.transform.AsTableAddGameobject(maxLevelGroupTemplate.gameObject);
                 Text maxLevelGroupLabel_0 = maxLevelGroup.transform.Find("label_0").GetComponent<Text>();
                 Text maxLevelGroupLabel_1 = maxLevelGroup.transform.Find("label_1").GetComponent<Text>();
 
-                maxLevelGroupLabel_0.text = model.upgradeCostPack.descriptionStart;
-                maxLevelGroupLabel_1.text = model.descriptionPackage.upgradeMaxLevelDescription;
+                maxLevelGroupLabel_0.text = model.upgradeComponent.upgradeCostPack.descriptionStart;
+                maxLevelGroupLabel_1.text = model.descriptionPackage.upgradeMaxLevelNoTransferDescription;
+
+                buildOnePack(model.upgradeComponent.transformCostPack);
             }
 
+            buildOnePack(model.destoryCostPack);
+            buildOnePack(model.destoryGainPack);
+
+            
         }
 
         private void buildOnePack(ResourcePack pack)
@@ -92,7 +102,7 @@ namespace hundun.idleshare.enginecore
         }
 
 
-        public void update(ConstructionExportProxy model)
+        public void update(BaseConstruction model)
         {
             rebuildCells(model);
         }

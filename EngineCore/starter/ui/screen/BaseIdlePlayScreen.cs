@@ -12,25 +12,25 @@ using UnityEngine;
 namespace hundun.idleshare.enginecore
 {
     public abstract class BaseIdlePlayScreen<T_GAME, T_SAVE> : 
-        BaseHundunScreen<T_GAME, T_SAVE>, IAchievementUnlockCallback, ISecondaryInfoBoardCallback<ConstructionExportProxy> 
+        BaseHundunScreen<T_GAME, T_SAVE>, 
+        IAchievementUnlockCallback, 
+        INotificationBoardCallerAndCallback, 
+        ISecondaryInfoBoardCallback<BaseConstruction> 
         where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
         // ----- unity adapter ------
         protected GameObject Contrainer { get; private set; }
-        protected GameObject PopoupRoot { get; private set; }
+        protected GameObject PopupRoot { get; private set; }
         protected GameObject UiRoot { get; private set; }
         protected GameObject Templates { get; private set; }
         protected AudioSource audioSource;
 
         // ----- ui ------
-        protected IdleScreenBackgroundVM screenBackgroundVM;
-        protected StorageInfoBoardVM<T_GAME, T_SAVE> storageInfoBoardVM;
-        protected FixedConstructionControlBoardVM<T_GAME, T_SAVE> constructionControlBoardVM;
-        protected GameImageDrawer<T_GAME, T_SAVE> gameImageDrawer;
-        protected GameAreaControlBoardVM<T_GAME, T_SAVE> gameAreaControlBoardVM;
+        //protected IdleScreenBackgroundVM screenBackgroundVM;
         
         // ----- popup ui ------
         protected AchievementMaskBoard<T_GAME, T_SAVE> achievementMaskBoard;
+        protected NotificationMaskBoard<T_GAME, T_SAVE> notificationMaskBoard;
         protected PopupInfoBoardVM<T_GAME, T_SAVE> popupInfoBoardVM;
 
         // ----- not ui ------
@@ -44,18 +44,16 @@ namespace hundun.idleshare.enginecore
         virtual protected void Awake()
         {
             Contrainer = this.gameObject;
-            PopoupRoot = this.transform.Find("_popupRoot").gameObject;
+            PopupRoot = this.transform.Find("_popupRoot").gameObject;
             UiRoot = this.transform.Find("_uiRoot").gameObject;
             Templates = this.transform.Find("_templates").gameObject;
             audioSource = this.transform.Find("_audioSource").GetComponent<AudioSource>();
 
-            this.screenBackgroundVM = this.Contrainer.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
-            this.storageInfoBoardVM = this.UiRoot.transform.Find("cell_0/StorageInfoBoardVM").gameObject.GetComponent<StorageInfoBoardVM<T_GAME, T_SAVE>>();
-            this.constructionControlBoardVM = this.UiRoot.transform.Find("cell_1/FixedConstructionControlBoardVM").gameObject.GetComponent<FixedConstructionControlBoardVM<T_GAME, T_SAVE>>();
-            this.gameAreaControlBoardVM = this.UiRoot.transform.Find("cell_2/GameAreaControlBoardVM").gameObject.GetComponent<GameAreaControlBoardVM<T_GAME, T_SAVE>>();
+            //this.screenBackgroundVM = this.Contrainer.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
             
-            this.popupInfoBoardVM = this.PopoupRoot.transform.Find("PopupInfoBoardVM").gameObject.GetComponent<PopupInfoBoardVM<T_GAME, T_SAVE>>();
-            this.achievementMaskBoard = this.PopoupRoot.transform.Find("AchievementMaskBoard").gameObject.GetComponent<AchievementMaskBoard<T_GAME, T_SAVE>>();
+            this.popupInfoBoardVM = this.PopupRoot.transform.Find("PopupInfoBoardVM").gameObject.GetComponent<PopupInfoBoardVM<T_GAME, T_SAVE>>();
+            this.achievementMaskBoard = this.PopupRoot.transform.Find("AchievementMaskBoard").gameObject.GetComponent<AchievementMaskBoard<T_GAME, T_SAVE>>();
+            this.notificationMaskBoard = this.PopupRoot.transform.Find("NotificationMaskBoard").gameObject.GetComponent<NotificationMaskBoard<T_GAME, T_SAVE>>();
         }
 
         virtual public void postMonoBehaviourInitialization(T_GAME game, String startArea,
@@ -100,22 +98,18 @@ namespace hundun.idleshare.enginecore
 
         virtual protected void lazyInitLogicContext()
         {
-            this.gameImageDrawer = new GameImageDrawer<T_GAME, T_SAVE>();
             this.gameEntityManager = new GameEntityManager<T_GAME, T_SAVE>();
             gameEntityManager.lazyInit(this.game, 
-                game.childGameConfig.areaShowEntityByOwnAmountConstructionIds, 
+                game.childGameConfig.areaShowEntityByOwnAmountConstructionPrototypeIds, 
                 game.childGameConfig.areaShowEntityByOwnAmountResourceIds, 
                 game.childGameConfig.areaShowEntityByChangeAmountResourceIds);
 
-            logicFrameListeners.Add(constructionControlBoardVM);
+            
             logicFrameListeners.Add(game.idleGameplayExport);
 
-            gameAreaChangeListeners.Add(screenBackgroundVM);
-            gameAreaChangeListeners.Add(constructionControlBoardVM);
-            gameAreaChangeListeners.Add(gameAreaControlBoardVM);
+            //gameAreaChangeListeners.Add(screenBackgroundVM);
 
             this.game.idleGameplayExport.eventManagerRegisterListener(this);
-            this.game.idleGameplayExport.eventManagerRegisterListener(gameImageDrawer);
         }
 
 
@@ -131,9 +125,14 @@ namespace hundun.idleshare.enginecore
             {
                 logicFrameListener.onLogicFrame();
             }
+
+            if (logicFrameHelper.clockCount % logicFrameHelper.secondToFrameNum(10) == 0)
+            {
+                game.saveHandler.gameSaveCurrent();
+            }
         }
 
-        public void showAndUpdateGuideInfo(ConstructionExportProxy model)
+        public void showAndUpdateGuideInfo(BaseConstruction model)
         {
             popupInfoBoardVM.gameObject.SetActive(true);
             popupInfoBoardVM.update(model);
@@ -146,21 +145,39 @@ namespace hundun.idleshare.enginecore
 
         override protected void gameObjectDraw(float delta)
         {
-            gameImageDrawer.allEntitiesMoveForFrameAndDraw();
+
         }
 
-        public void hideAchievementMaskBoard()
+        virtual public void hideAchievementMaskBoard()
         {
             game.frontend.log(this.getClass().getSimpleName(), "hideAchievementMaskBoard called");
             achievementMaskBoard.gameObject.SetActive(false);
+            logicFrameHelper.logicFramePause = false;
         }
 
-        public void onAchievementUnlock(AchievementPrototype prototype)
+        virtual public void showAchievementMaskBoard(AbstractAchievement prototype)
         {
-            game.frontend.log(this.getClass().getSimpleName(), "onAchievementUnlock called");
+            game.frontend.log(this.getClass().getSimpleName(), "showAchievementMaskBoard called");
             achievementMaskBoard.gameObject.SetActive(true);
             achievementMaskBoard.setAchievementPrototype(prototype);
+            logicFrameHelper.logicFramePause = true;
         }
+
+        public void hideNotificationMaskBoard()
+        {
+            game.frontend.log(this.getClass().getSimpleName(), "hideNotificationMaskBoard called");
+            notificationMaskBoard.gameObject.SetActive(false);
+            logicFrameHelper.logicFramePause = false;
+        }
+
+        public void showNotificationMaskBoard(String data)
+        {
+            game.frontend.log(this.getClass().getSimpleName(), "showNotificationMaskBoard called");
+            notificationMaskBoard.gameObject.SetActive(true);
+            notificationMaskBoard.setData(data);
+            logicFrameHelper.logicFramePause = true;
+        }
+
     }
 
 }

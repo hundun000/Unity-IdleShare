@@ -1,41 +1,49 @@
 ﻿using hundun.idleshare.gamelib;
+using hundun.unitygame.adapters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static UnityEditor.Progress;
+using UnityEngine.UIElements;
 
 namespace hundun.idleshare.gamelib
 {
     public class BaseConstructionFactory
     {
-        Dictionary<String, BaseConstruction> constructions = new Dictionary<String, BaseConstruction>();
+        IdleGameplayContext gameContext;
+        Language language;
+        Dictionary<String, AbstractConstructionPrototype> providerMap;
+        
 
-        public BaseConstruction getConstruction(String id)
+
+
+        
+
+        public void lazyInit(IdleGameplayContext gameContext, Language language, Dictionary<String, AbstractConstructionPrototype> providerMap)
         {
-            BaseConstruction result = constructions[id];
-            if (result == null)
-            {
-                throw new SystemException("getConstruction " + id + " not found");
-            }
-            return result;
+            this.language = language;
+            this.providerMap = providerMap;
+            this.gameContext = gameContext;
         }
 
-        public List<BaseConstruction> getConstructions()
+        internal AbstractConstructionPrototype getPrototype(string prototypeId)
         {
-            return constructions.Values.ToList();
+            AbstractConstructionPrototype prototype = providerMap.get(prototypeId);
+            prototype.lazyInitDescription(gameContext, language);
+            return prototype;
         }
 
-        public void lazyInit(IdleGameplayContext gameContext, Language language, List<BaseConstruction> constructionsList)
+
+        internal BaseConstruction getInstanceOfPrototype(string prototypeId, GridPosition position)
         {
-            constructionsList.ForEach(item => this.constructions.Add(item.id, item));
-            foreach (KeyValuePair<String, BaseConstruction> entry in constructions)
-            {
-                var it = entry.Value;
-                it.lazyInitDescription(gameContext, language);
-                gameContext.eventManager.registerListener(it);
-            }
+            AbstractConstructionPrototype prototype = providerMap.get(prototypeId);
+            BaseConstruction construction = prototype.getInstance(position);
+            construction.lazyInitDescription(gameContext, language);
+            gameContext.eventManager.registerListener(construction);
+            return construction;
         }
+
+
     }
 }

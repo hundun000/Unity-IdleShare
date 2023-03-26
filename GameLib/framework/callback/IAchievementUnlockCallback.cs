@@ -9,7 +9,7 @@ namespace hundun.idleshare.gamelib
     public interface IAchievementUnlockCallback
     {
         void hideAchievementMaskBoard();
-        void onAchievementUnlock(AchievementPrototype prototype);
+        void showAchievementMaskBoard(AbstractAchievement prototype);
     }
 }
 

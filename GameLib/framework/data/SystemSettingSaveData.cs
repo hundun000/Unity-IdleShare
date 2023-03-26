@@ -18,5 +18,10 @@ namespace hundun.idleshare.gamelib
         {
             this.language = language;
         }
+
+        public override string ToString()
+        {
+            return "SystemSettingSaveData(" + "language=" + language + ")";
+        }
     }
 }

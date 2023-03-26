@@ -3,15 +3,15 @@ using hundun.idleshare.enginecore;
 using hundun.unitygame.adapters;
 using System.Collections.Generic;
 using System;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using hundun.unitygame.enginecorelib;
 using Unity.VisualScripting;
 using UnityEngine.UI;
+using hundun.unitygame.gamelib;
 
 namespace hundun.idleshare.enginecore
 {
-    public class StorageInfoBoardVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
+    public class StorageInfoBoardVM<T_GAME, T_SAVE> : MonoBehaviour, ILogicFrameListener where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
 
         private Image background;
@@ -28,16 +28,11 @@ namespace hundun.idleshare.enginecore
 
 
         //Label mainLabel;
-        private void Start()
+        private void Awake()
         {
             this.background = this.transform.Find("background").GetComponent<Image>();
             this.nodesRoot = this.transform.Find("_nodesRoot").gameObject;
             this.nodePrefab = this.transform.Find("_templates/nodePrefab").gameObject;
-        }
-
-        private void Update()
-        {
-            updateViewData();
         }
 
         public void postPrefabInitialization(BaseIdlePlayScreen<T_GAME, T_SAVE> parent, List<String> shownOrders)
@@ -71,7 +66,7 @@ namespace hundun.idleshare.enginecore
 
 
 
-        public void updateViewData()
+        private void updateViewData()
         {
             Boolean needRebuildCells = !shownTypes.Equals(parent.game.idleGameplayExport.getUnlockedResourceTypes());
             if (needRebuildCells)
@@ -85,7 +80,9 @@ namespace hundun.idleshare.enginecore
                 );
         }
 
-
-
+        public void onLogicFrame()
+        {
+            updateViewData();
+        }
     }
 }

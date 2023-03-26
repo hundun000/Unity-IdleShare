@@ -4,20 +4,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static UnityEditor.Progress;
 using Unity.VisualScripting;
+using hundun.unitygame.adapters;
 
 namespace hundun.idleshare.gamelib
 {
-    public class AchievementManager : IBuffChangeListener, IOneFrameResourceChangeListener, IGameStartListener
+    public class AchievementInfoPackage
+    {
+        public readonly AbstractAchievement firstLockedAchievement;
+        public readonly int total;
+        public readonly int unLockedSize;
+
+        public AchievementInfoPackage(AbstractAchievement firstLockedAchievement, int total, int unLockedSize)
+        {
+            this.firstLockedAchievement = firstLockedAchievement;
+            this.total = total;
+            this.unLockedSize = unLockedSize;
+        }
+    }
+
+    public class AchievementManager : IBuffChangeListener, IOneFrameResourceChangeListener, IGameStartListener, IConstructionCollectionListener
     {
         IdleGameplayContext gameContext;
 
-        Dictionary<String, AchievementPrototype> prototypes = new Dictionary<String, AchievementPrototype>();
+        Dictionary<String, AbstractAchievement> prototypes = new Dictionary<String, AbstractAchievement>();
 
 
-        public HashSet<String> unlockedAchievementNames = new HashSet<String>();
-
+        public HashSet<String> unlockedAchievementIds = new HashSet<String>();
+        private List<String> totalAchievementIds = new List<string>();
+        private List<String> achievementQueue = new List<string>();
 
         public AchievementManager(IdleGameplayContext gameContext)
         {
@@ -25,9 +40,24 @@ namespace hundun.idleshare.gamelib
             gameContext.eventManager.registerListener(this);
         }
 
-        public void addPrototype(AchievementPrototype prototype)
+        public void addPrototype(AbstractAchievement prototype)
         {
-            prototypes.Add(prototype.name, prototype);
+            prototypes.Add(prototype.id, prototype);
+            prototype.lazyInitDescription(gameContext);
+        }
+
+
+        public AchievementInfoPackage getAchievementInfoPackage()
+        {
+            AbstractAchievement firstLockedAchievement = achievementQueue
+                .Where(it => !unlockedAchievementIds.Contains(prototypes.get(it).id))
+                .Select(it => prototypes.get(it))
+                .FirstOrDefault();
+            return new AchievementInfoPackage(
+                firstLockedAchievement,
+                totalAchievementIds.Count,
+                unlockedAchievementIds.Count
+                );
         }
 
         private Boolean checkRequiredResources(Dictionary<String, int> requiredResources)
@@ -67,18 +97,16 @@ namespace hundun.idleshare.gamelib
         private void checkAllAchievementUnlock()
         {
             //Gdx.app.log(this.getClass().getSimpleName(), "checkAllAchievementUnlock");
-            foreach (AchievementPrototype prototype in prototypes.Values)
+            foreach (AbstractAchievement prototype in prototypes.Values)
             {
-                if (unlockedAchievementNames.Contains(prototype.name))
+                if (unlockedAchievementIds.Contains(prototype.id))
                 {
                     continue;
                 }
-                Boolean resourceMatched = checkRequiredResources(prototype.requiredResources);
-                Boolean buffMatched = checkRequiredBuffs(prototype.requiredBuffs);
-                Boolean allMatched = resourceMatched && buffMatched;
-                if (allMatched)
+                Boolean resourceMatched = prototype.checkUnloack();
+                if (resourceMatched)
                 {
-                    unlockedAchievementNames.Add(prototype.name);
+                    unlockedAchievementIds.Add(prototype.id);
                     gameContext.eventManager.notifyAchievementUnlock(prototype);
                 }
             }
@@ -91,9 +119,11 @@ namespace hundun.idleshare.gamelib
             checkAllAchievementUnlock();
         }
 
-        public void lazyInit(List<AchievementPrototype> achievementPrototypes)
+        public void lazyInit(Dictionary<string, AbstractAchievement> achievementProviderMap, List<String> achievementPrototypeIds)
         {
-            achievementPrototypes.ForEach(item => addPrototype(item));
+            achievementPrototypeIds.ForEach(it => addPrototype(achievementProviderMap.get(it)));
+            this.totalAchievementIds = achievementPrototypeIds;
+            this.achievementQueue = new List<string>(achievementPrototypeIds);
         }
 
 
@@ -103,6 +133,11 @@ namespace hundun.idleshare.gamelib
         }
 
         public void onGameStart()
+        {
+            checkAllAchievementUnlock();
+        }
+
+        public void onConstructionCollectionChange()
         {
             checkAllAchievementUnlock();
         }

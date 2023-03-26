@@ -37,7 +37,7 @@ namespace hundun.idleshare.enginecore
 
         override public void dispose()
         {
-            saveHandler.gameSaveCurrent();
+            //saveHandler.gameSaveCurrent();
         }
     }
 }

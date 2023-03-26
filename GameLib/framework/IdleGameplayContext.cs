@@ -41,11 +41,14 @@ namespace hundun.idleshare.gamelib
 
         }
 
-        public void allLazyInit(Language language, ChildGameConfig childGameConfig, List<BaseConstruction> constructions)
+        public void allLazyInit(Language language, ChildGameConfig childGameConfig, 
+            Dictionary<String, AbstractConstructionPrototype> providerMap,
+            Dictionary<String, AbstractAchievement> achievementProviderMap
+            )
         {
-            this.constructionFactory.lazyInit(this, language, constructions);
-            this.constructionManager.lazyInit(childGameConfig.areaControlableConstructionIds);
-            this.achievementManager.lazyInit(childGameConfig.achievementPrototypes);
+            this.constructionFactory.lazyInit(this, language, providerMap);
+            this.constructionManager.lazyInit(childGameConfig.areaControlableConstructionVMPrototypeIds, childGameConfig.areaControlableConstructionPrototypeVMPrototypeIds);
+            this.achievementManager.lazyInit(achievementProviderMap, childGameConfig.achievementPrototypeIds);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace hundun.idleshare.gamelib
         protected int autoOutputProgress = 0;
 
 
-        public BaseAutoConstruction(String id
-                ) : base(id)
+        public BaseAutoConstruction(String prototypeId, String id
+                ) : base(prototypeId, id)
         {
         }
 
@@ -35,18 +35,6 @@ namespace hundun.idleshare.gamelib
                 return;
             }
             doUpgrade();
-        }
-
-        private void doUpgrade()
-        {
-            List<ResourcePair> upgradeCostRule = upgradeComponent.upgradeCostPack.modifiedValues;
-            gameContext.storageManager.modifyAllResourceNum(upgradeCostRule, false);
-            saveData.level = (saveData.level + 1);
-            if (!levelComponent.workingLevelChangable)
-            {
-                saveData.workingLevel = (saveData.level);
-            }
-            updateModifiedValues();
         }
 
         override public Boolean canClickEffect()
@@ -84,12 +72,12 @@ namespace hundun.idleshare.gamelib
             }
         }
 
-        override public long calculateModifiedOutput(long baseValue, int level)
+        override public long calculateModifiedOutput(long baseValue, int level, int proficiency)
         {
             return baseValue * level;
         }
 
-        override public long calculateModifiedOutputCost(long baseValue, int level)
+        override public long calculateModifiedOutputCost(long baseValue, int level, int proficiency)
         {
             return baseValue * level;
         }

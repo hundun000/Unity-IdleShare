@@ -52,7 +52,9 @@ namespace hundun.idleshare.enginecore
             if (currentBgmSound != null) {
                 music.Stop();
             }
-            music.PlayOneShot(bgmSound);
+            music.loop = true;
+            music.clip = bgmSound;
+            music.Play();
             currentBgmSound = bgmSound;
         }
     }

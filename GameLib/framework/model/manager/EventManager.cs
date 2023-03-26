@@ -12,8 +12,11 @@ namespace hundun.idleshare.gamelib
     {
         List<IBuffChangeListener> buffChangeListeners = new List<IBuffChangeListener>();
         List<IAchievementUnlockCallback> achievementUnlockListeners = new List<IAchievementUnlockCallback>();
+        List<INotificationBoardCallerAndCallback> notificationBoardCallerAndCallbacks = new List<INotificationBoardCallerAndCallback>();
         List<IOneFrameResourceChangeListener> oneFrameResourceChangeListeners = new List<IOneFrameResourceChangeListener>();
+        List<IConstructionCollectionListener> constructionCollectionListeners = new List<IConstructionCollectionListener>();
 
+        
         IdleGameplayContext gameContext;
 
 
@@ -30,8 +33,16 @@ namespace hundun.idleshare.gamelib
             if (listener is IAchievementUnlockCallback && !achievementUnlockListeners.Contains(listener)) {
                 achievementUnlockListeners.Add((IAchievementUnlockCallback)listener);
             }
+            if (listener is INotificationBoardCallerAndCallback && !notificationBoardCallerAndCallbacks.Contains(listener))
+            {
+                notificationBoardCallerAndCallbacks.Add((INotificationBoardCallerAndCallback)listener);
+            }
             if (listener is IOneFrameResourceChangeListener && !oneFrameResourceChangeListeners.Contains(listener)) {
                 oneFrameResourceChangeListeners.Add((IOneFrameResourceChangeListener)listener);
+            }
+            if (listener is IConstructionCollectionListener && !constructionCollectionListeners.Contains(listener))
+            {
+                constructionCollectionListeners.Add((IConstructionCollectionListener)listener);
             }
         }
 
@@ -60,12 +71,30 @@ namespace hundun.idleshare.gamelib
             }
         }
 
-        public void notifyAchievementUnlock(AchievementPrototype prototype)
+        public void notifyAchievementUnlock(AbstractAchievement prototype)
         {
             gameContext.frontend.log(this.getClass().getSimpleName(), "notifyAchievementUnlock");
             foreach (IAchievementUnlockCallback listener in achievementUnlockListeners)
             {
-                listener.onAchievementUnlock(prototype);
+                listener.showAchievementMaskBoard(prototype);
+            }
+        }
+
+        public void notifyNotification(String data)
+        {
+            gameContext.frontend.log(this.getClass().getSimpleName(), "notifyNotification");
+            foreach (INotificationBoardCallerAndCallback listener in notificationBoardCallerAndCallbacks)
+            {
+                listener.showNotificationMaskBoard(data);
+            }
+        }
+
+        public void notifyConstructionCollectionChange()
+        {
+            //Gdx.app.log(this.getClass().getSimpleName(), "notifyOneFrameResourceChange");
+            foreach (IConstructionCollectionListener listener in constructionCollectionListeners)
+            {
+                listener.onConstructionCollectionChange();
             }
         }
     }

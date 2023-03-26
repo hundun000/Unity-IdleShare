@@ -1,23 +1,27 @@
 ﻿using hundun.unitygame.gamelib;
+using Map;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Unity.VisualScripting.Icons;
 
 namespace hundun.idleshare.gamelib
 {
-    public abstract class BaseConstruction : ILogicFrameListener, IBuffChangeListener {
+    public abstract class BaseConstruction : ILogicFrameListener, IBuffChangeListener, ITileNode<BaseConstruction>
+    {
+        public int maxProficiency = 100;
+        internal bool allowAnyProficiencyDestory = true;
 
-        public static readonly int DEFAULT_MAX_LEVEL = 99;
-
+        public static readonly int DEFAULT_MAX_LEVEL = 5;
         public int maxLevel = DEFAULT_MAX_LEVEL;
 
-
         public static readonly int DEFAULT_MAX_DRAW_NUM = 5;
-
         public int maxDrawNum = DEFAULT_MAX_DRAW_NUM;
+
+        public static readonly int DEFAULT_MIN_WORKING_LEVEL = 0;
+        public int minWorkingLevel = DEFAULT_MIN_WORKING_LEVEL;
 
         protected Random random = new Random();
 
@@ -32,11 +36,20 @@ namespace hundun.idleshare.gamelib
 
         public String id;
 
+        public String prototypeId { get => saveData.prototypeId; }
+
         public String detailDescroptionConstPart;
 
         public DescriptionPackage descriptionPackage;
 
-
+        /**
+        * Nullable
+        */
+        public ResourcePack destoryCostPack;
+        /**
+        * Nullable
+        */
+        public ResourcePack destoryGainPack;
         /**
          * NotNull
          */
@@ -53,24 +66,39 @@ namespace hundun.idleshare.gamelib
          */
         public LevelComponent levelComponent;
 
+        /**
+         * NotNull
+         */
+        public ProficiencyComponent proficiencyComponent;
+
+        private Dictionary<TileNeighborDirection, BaseConstruction> _neighbors;
+        internal bool allowPositionOverwrite = false;
+
+        public GridPosition position { get => this.saveData.position; set => this.saveData.position = value; }
+        public Dictionary<TileNeighborDirection, BaseConstruction> neighbors { get => _neighbors; set => _neighbors = value; }
 
         public void lazyInitDescription(IdleGameplayContext gameContext, Language language)
         {
             this.gameContext = gameContext;
 
-            this.name = gameContext.gameDictionary.constructionIdToShowName(language, id);
-            this.detailDescroptionConstPart = gameContext.gameDictionary.constructionIdToDetailDescroptionConstPart(language, id);
+            this.name = gameContext.gameDictionary.constructionPrototypeIdToShowName(language, prototypeId);
+            this.detailDescroptionConstPart = gameContext.gameDictionary.constructionPrototypeIdToDetailDescroptionConstPart(language, prototypeId);
 
             outputComponent.lazyInitDescription();
             upgradeComponent.lazyInitDescription();
+            if (destoryGainPack != null)
+            {
+                this.destoryGainPack.descriptionStart = descriptionPackage.destroyGainDescriptionStart;
+                this.destoryCostPack.descriptionStart = descriptionPackage.destroyCostDescriptionStart;
+            }
 
             updateModifiedValues();
         }
 
-        public BaseConstruction(String id)
+        public BaseConstruction(String prototypeId, String id)
         {
 
-            this.saveData = new ConstructionSaveData();
+            this.saveData = new ConstructionSaveData(prototypeId);
             this.id = id;
         }
 
@@ -78,14 +106,9 @@ namespace hundun.idleshare.gamelib
 
         public abstract Boolean canClickEffect();
 
-        public String getButtonDescroption()
-        {
-            return descriptionPackage.buttonDescroption;
-        }
-
         //protected abstract long calculateModifiedUpgradeCost(long baseValue, int level);
-        public abstract long calculateModifiedOutput(long baseValue, int level);
-        public abstract long calculateModifiedOutputCost(long baseValue, int level);
+        public abstract long calculateModifiedOutput(long baseValue, int level, int proficiency);
+        public abstract long calculateModifiedOutputCost(long baseValue, int level, int proficiency);
 
 
 
@@ -99,6 +122,24 @@ namespace hundun.idleshare.gamelib
             Boolean reachMaxLevel = this.saveData.level == this.maxLevel;
             upgradeComponent.updateModifiedValues(reachMaxLevel);
             outputComponent.updateModifiedValues();
+
+            if (destoryGainPack != null)
+            {
+                destoryCostPack.modifiedValues = destoryCostPack.baseValues;
+                destoryCostPack.modifiedValuesDescription = (String.Join(", ",
+                        destoryCostPack.modifiedValues
+                                .Select(pair => pair.type + "x" + pair.amount)
+                                .ToList())
+                                + "; "
+                );
+                destoryGainPack.modifiedValues = destoryGainPack.baseValues;
+                destoryGainPack.modifiedValuesDescription = (String.Join(", ",
+                        destoryGainPack.modifiedValues
+                                .Select(pair => pair.type + "x" + pair.amount)
+                                .ToList())
+                                + "; "
+                );
+            }
 
         }
 
@@ -118,11 +159,49 @@ namespace hundun.idleshare.gamelib
         {
             return outputComponent.canOutput();
         }
+        protected void doOutput()
+        {
+            if (outputComponent.hasCost())
+            {
+                gameContext.storageManager.modifyAllResourceNum(outputComponent.outputCostPack.modifiedValues, false);
+            }
+            if (outputComponent.outputGainPack != null)
+            {
+                gameContext.storageManager.modifyAllResourceNum(outputComponent.outputGainPack.modifiedValues, true);
+            }
+        }
 
-
-        protected Boolean canUpgrade()
+        public Boolean canUpgrade()
         {
             return upgradeComponent.canUpgrade();
+        }
+
+        public Boolean canTransfer()
+        {
+            return upgradeComponent.canTransfer();
+        }
+
+        public void doUpgrade()
+        {
+            List<ResourcePair> upgradeCostRule = upgradeComponent.upgradeCostPack.modifiedValues;
+            gameContext.storageManager.modifyAllResourceNum(upgradeCostRule, false);
+            saveData.level = (saveData.level + 1);
+            if (!levelComponent.workingLevelChangable)
+            {
+                saveData.workingLevel = (saveData.level);
+            }
+            saveData.proficiency = maxProficiency / 2;
+            updateModifiedValues();
+            gameContext.eventManager.notifyConstructionCollectionChange();
+        }
+
+        public Boolean canDestory() 
+        {
+            if (!allowAnyProficiencyDestory && this.saveData.proficiency < this.maxProficiency)
+            {
+                return false;
+            }
+            return destoryCostPack != null && gameContext.storageManager.isEnough(destoryCostPack.modifiedValues);
         }
 
         public String getSaveDataKey()
