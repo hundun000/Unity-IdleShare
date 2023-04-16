@@ -27,8 +27,7 @@ namespace hundun.idleshare.enginecore
         protected Text title;
         protected TextButton buttonContinueGame;
         protected TextButton buttonNewGame;
-        protected LanguageSwitchBoardVM<T_GAME, T_SAVE> languageSwitchBoardVM;
-
+        
         virtual public void postMonoBehaviourInitialization(T_GAME game,
             JRunable buttonContinueGameInputListener,
             JRunable buttonNewGameInputListener
@@ -48,7 +47,6 @@ namespace hundun.idleshare.enginecore
             this.title = this.UiRoot.transform.Find("title").gameObject.GetComponent<Text>();
             this.buttonContinueGame = this.UiRoot.transform.Find("buttonContinueGame").gameObject.GetComponent<TextButton>();
             this.buttonNewGame = this.UiRoot.transform.Find("buttonNewGame").gameObject.GetComponent<TextButton>();
-            this.languageSwitchBoardVM = this.UiRoot.transform.Find("languageSwitchBoardVM").gameObject.GetComponent<LanguageSwitchBoardVM<T_GAME, T_SAVE>>();
             this.screenBackgroundVM = gameObject.transform.transform.Find("ScreenBackgroundVM").gameObject.GetComponent<IdleScreenBackgroundVM>();
 
         }
@@ -75,20 +73,6 @@ namespace hundun.idleshare.enginecore
                 buttonContinueGame.gameObject.SetActive(true);
             }
 
-            languageSwitchBoardVM.postPrefabInitialization(
-                this,
-                Enum.GetValues(typeof(Language)).OfType<Language>().ToArray(),
-                game.idleGameplayExport.language,
-                memuScreenTexts.get(3),
-                memuScreenTexts.get(4),
-                it => {
-                    game.idleGameplayExport.language = it;
-                    game.saveHandler.gameSaveCurrent();
-                    }
-                );
-
-            // unity adapter
-            game.audioPlayManager.intoScreen(audioSource, this.getClass().getSimpleName());
         }
     }
 }

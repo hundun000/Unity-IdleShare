@@ -15,11 +15,11 @@ namespace hundun.idleshare.enginecore
 {
     public class LanguageSwitchBoardVM<T_GAME, T_SAVE> : MonoBehaviour where T_GAME : BaseIdleGame<T_GAME, T_SAVE>
     {
-        BaseHundunScreen<T_GAME, T_SAVE> parent;
-        Dropdown selectBox;
-        Text label;
-        Text restartHintLabel;
-        private Dictionary<Language, string> languageShowNameMap;
+        protected BaseHundunScreen<T_GAME, T_SAVE> parent;
+        protected Dropdown selectBox;
+        protected Text label;
+        protected Text restartHintLabel;
+        protected Dictionary<Language, string> languageShowNameMap;
 
         void Awake()
         {
@@ -28,33 +28,12 @@ namespace hundun.idleshare.enginecore
             this.restartHintLabel = this.transform.Find("restartHintLabel").GetComponent<Text>();
         }
 
-        public void postPrefabInitialization(BaseHundunScreen<T_GAME, T_SAVE> parent,
-                Language[] values,
-                Language current,
-                String startText,
-                String hintText,
-                JConsumer<Language> onSelect
-                )
+        virtual public void postPrefabInitialization(BaseHundunScreen<T_GAME, T_SAVE> parent)
         {
             this.parent = parent;
             this.GetComponent<Image>().sprite = (parent.game.textureManager.defaultBoardNinePatchTexture);
             this.languageShowNameMap = parent.game.idleGameplayExport.gameDictionary.getLanguageShowNameMap();
 
-            /*
-            selectBox.options = values
-                .Select(it => new Dropdown.OptionData(languageShowNameMap.get(it)))
-                .ToList();
-            selectBox.value = selectBox.options.FindIndex(0, it => it.text.Equals(languageShowNameMap.get(current)));
-            selectBox.onValueChanged.AddListener(it =>
-            {
-                restartHintLabel.gameObject.SetActive(true);
-                Language language = languageShowNameMap.FirstOrDefault(x => x.Value == selectBox.options[it].text).Key;
-                onSelect.Invoke(language);
-            });
-
-            this.label.text = startText;
-            this.restartHintLabel.text = hintText;
-            */
 
         }
 
