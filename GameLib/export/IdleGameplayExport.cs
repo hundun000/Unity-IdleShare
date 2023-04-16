@@ -20,6 +20,7 @@ namespace hundun.idleshare.gamelib
         private ChildGameConfig childGameConfig;
         public IGameDictionary gameDictionary;
         public Language language;
+        public String stageId;
 
         public IdleGameplayExport(
                 IFrontend frontEnd,
@@ -129,10 +130,12 @@ namespace hundun.idleshare.gamelib
 
         public void applyGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
+            this.stageId = gameplaySaveData.stageId;
+
             gameplaySaveData.constructionSaveDataMap.Values.ToList().ForEach(it => {
                 gameplayContext.constructionManager.loadInstance(it);
             });
-
+            
             gameplayContext.storageManager.unlockedResourceTypes = (gameplaySaveData.unlockedResourceTypes);
             gameplayContext.storageManager.ownResoueces = (gameplaySaveData.ownResoueces);
             gameplayContext.achievementManager.unlockedAchievementIds = (gameplaySaveData.unlockedAchievementIds);
@@ -140,6 +143,8 @@ namespace hundun.idleshare.gamelib
 
         public void currentSituationToGameplaySaveData(GameplaySaveData gameplaySaveData)
         {
+            gameplaySaveData.stageId = this.stageId;
+
             List<BaseConstruction> constructions = gameplayContext.constructionManager.getConstructions();
             gameplaySaveData.constructionSaveDataMap = (constructions
                     .ToDictionary(

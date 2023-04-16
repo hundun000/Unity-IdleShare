@@ -15,11 +15,18 @@ namespace hundun.idleshare.gamelib
         public readonly int total;
         public readonly int unLockedSize;
 
-        public AchievementInfoPackage(AbstractAchievement firstLockedAchievement, int total, int unLockedSize)
+        public readonly List<AbstractAchievement> allAchievementList;
+        public readonly HashSet<String> unlockedAchievementIds;
+
+        public AchievementInfoPackage(AbstractAchievement firstLockedAchievement, int total, int unLockedSize,
+            List<AbstractAchievement> allAchievementList, HashSet<String> unlockedAchievementIds
+            )
         {
             this.firstLockedAchievement = firstLockedAchievement;
             this.total = total;
             this.unLockedSize = unLockedSize;
+            this.allAchievementList = allAchievementList;
+            this.unlockedAchievementIds = unlockedAchievementIds;
         }
     }
 
@@ -49,14 +56,17 @@ namespace hundun.idleshare.gamelib
 
         public AchievementInfoPackage getAchievementInfoPackage()
         {
-            AbstractAchievement firstLockedAchievement = achievementQueue
-                .Where(it => !unlockedAchievementIds.Contains(prototypes.get(it).id))
-                .Select(it => prototypes.get(it))
+            List<AbstractAchievement> allAchievementList = achievementQueue.Select(it => prototypes.get(it)).ToList();
+
+            AbstractAchievement firstLockedAchievement = allAchievementList
+                .Where(it => !unlockedAchievementIds.Contains(it.id))
                 .FirstOrDefault();
             return new AchievementInfoPackage(
                 firstLockedAchievement,
                 totalAchievementIds.Count,
-                unlockedAchievementIds.Count
+                unlockedAchievementIds.Count,
+                allAchievementList,
+                unlockedAchievementIds
                 );
         }
 
@@ -108,6 +118,10 @@ namespace hundun.idleshare.gamelib
                 {
                     unlockedAchievementIds.Add(prototype.id);
                     gameContext.eventManager.notifyAchievementUnlock(prototype);
+                    if (prototype.awardResourceMap != null)
+                    {
+                        gameContext.storageManager.modifyAllResourceNum(prototype.awardResourceMap, true);
+                    }
                 }
             }
         }

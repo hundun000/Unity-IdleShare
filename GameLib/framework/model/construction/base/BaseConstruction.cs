@@ -12,6 +12,7 @@ namespace hundun.idleshare.gamelib
     public abstract class BaseConstruction : ILogicFrameListener, IBuffChangeListener, ITileNode<BaseConstruction>
     {
         public int maxProficiency = 100;
+        public int upgradeLostProficiency = 0;
         internal bool allowAnyProficiencyDestory = true;
 
         public static readonly int DEFAULT_MAX_LEVEL = 5;
@@ -107,7 +108,7 @@ namespace hundun.idleshare.gamelib
         public abstract Boolean canClickEffect();
 
         //protected abstract long calculateModifiedUpgradeCost(long baseValue, int level);
-        public abstract long calculateModifiedOutput(long baseValue, int level, int proficiency);
+        public abstract long calculateModifiedOutputGain(long baseValue, int level, int proficiency);
         public abstract long calculateModifiedOutputCost(long baseValue, int level, int proficiency);
 
 
@@ -190,7 +191,7 @@ namespace hundun.idleshare.gamelib
             {
                 saveData.workingLevel = (saveData.level);
             }
-            saveData.proficiency = maxProficiency / 2;
+            saveData.proficiency -= upgradeLostProficiency;
             updateModifiedValues();
             gameContext.eventManager.notifyConstructionCollectionChange();
         }

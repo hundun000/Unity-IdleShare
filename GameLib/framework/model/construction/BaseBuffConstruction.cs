@@ -43,7 +43,7 @@ namespace hundun.idleshare.gamelib
             return canUpgrade();
         }
 
-        public override long calculateModifiedOutput(long baseValue, int level, int proficiency)
+        public override long calculateModifiedOutputGain(long baseValue, int level, int proficiency)
         {
             throw new NotImplementedException();
         }

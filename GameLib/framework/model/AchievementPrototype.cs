@@ -15,13 +15,15 @@ namespace hundun.idleshare.gamelib
         public String name;
         public String description;
         public String congratulationText;
+        public Dictionary<String, long> awardResourceMap;
 
-        public AbstractAchievement(String id, string name, string description, string congratulationText)
+        public AbstractAchievement(String id, string name, string description, string congratulationText, Dictionary<String, long> awardResourceMap)
         {
             this.id = id;
             this.name = name;
             this.description = description;
             this.congratulationText = congratulationText;
+            this.awardResourceMap = awardResourceMap;
         }
 
         public abstract bool checkUnloack();

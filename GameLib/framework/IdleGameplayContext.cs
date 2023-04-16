@@ -13,7 +13,7 @@ namespace hundun.idleshare.gamelib
         public readonly int LOGIC_FRAME_PER_SECOND;
 
         public readonly IFrontend frontend;
-
+        
         public readonly EventManager eventManager;
         public readonly StorageManager storageManager;
         public readonly BuffManager buffManager;

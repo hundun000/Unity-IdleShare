@@ -40,6 +40,7 @@ namespace hundun.idleshare.enginecore
             this.GetComponent<Image>().sprite = (parent.game.textureManager.defaultBoardNinePatchTexture);
             this.languageShowNameMap = parent.game.idleGameplayExport.gameDictionary.getLanguageShowNameMap();
 
+            /*
             selectBox.options = values
                 .Select(it => new Dropdown.OptionData(languageShowNameMap.get(it)))
                 .ToList();
@@ -53,7 +54,7 @@ namespace hundun.idleshare.enginecore
 
             this.label.text = startText;
             this.restartHintLabel.text = hintText;
-
+            */
 
         }
 

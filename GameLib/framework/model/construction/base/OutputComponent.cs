@@ -51,7 +51,7 @@ namespace hundun.idleshare.gamelib
                 outputGainPack.modifiedValues = (
                         outputGainPack.baseValues
                                 .Select(pair => {
-                                    long newAmout = construction.calculateModifiedOutput(pair.amount, 
+                                    long newAmout = construction.calculateModifiedOutputGain(pair.amount, 
                                         construction.saveData.workingLevel,
                                         construction.saveData.proficiency
                                         );
@@ -72,7 +72,7 @@ namespace hundun.idleshare.gamelib
                     outputCostPack.modifiedValues = (
                         outputCostPack.baseValues
                                 .Select(pair => {
-                                    long newAmout = construction.calculateModifiedOutput(pair.amount, 
+                                    long newAmout = construction.calculateModifiedOutputGain(pair.amount, 
                                         construction.saveData.workingLevel,
                                         construction.saveData.proficiency);
                                     return new ResourcePair(pair.type, newAmout);
