@@ -36,6 +36,18 @@ namespace hundun.idleshare.gamelib
             return (construction.saveData.proficiency < 0) && demoteConstructionPrototypeId != null;
         }
 
+        public void doPromote()
+        {
+            construction.gameplayContext.constructionManager.addToRemoveQueue(construction);
+            construction.gameplayContext.constructionManager.addToCreateQueue(construction.proficiencyComponent.promoteConstructionPrototypeId, construction.position);
+        }
+
+        public void doDemote()
+        {
+            construction.gameplayContext.constructionManager.addToRemoveQueue(construction);
+            construction.gameplayContext.constructionManager.addToCreateQueue(construction.proficiencyComponent.demoteConstructionPrototypeId, construction.position);
+        }
+
         public void changeProficiency(int delta)
         {
             construction.saveData.proficiency = Math.Max(0, Math.Min(construction.saveData.proficiency + delta, this.maxProficiency));
@@ -50,6 +62,18 @@ namespace hundun.idleshare.gamelib
             construction.updateModifiedValues();
             construction.gameplayContext.frontend.log(construction.name, "cleanProficiency");
 
+        }
+
+        protected void checkAutoPromoteDemote()
+        {
+            if (this.canPromote())
+            {
+                this.doPromote();
+            }
+            else if (this.canDemote())
+            {
+                this.doDemote();
+            }
         }
 
         internal abstract void onSubLogicFrame();

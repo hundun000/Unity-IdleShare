@@ -153,5 +153,15 @@ namespace hundun.idleshare.gamelib
             List<ResourcePair> compareTarget = transformCostPack.modifiedValues;
             return construction.gameplayContext.storageManager.isEnough(compareTarget);
         }
+
+        public void doTransfer()
+        {
+            if (construction.upgradeComponent.transformCostPack != null)
+            {
+                construction.gameplayContext.storageManager.modifyAllResourceNum(construction.upgradeComponent.transformCostPack.modifiedValues, false);
+            }
+            construction.gameplayContext.constructionManager.addToRemoveQueue(construction);
+            construction.gameplayContext.constructionManager.addToCreateQueue(construction.upgradeComponent.transformConstructionPrototypeId, construction.position);
+        }
     }
 }

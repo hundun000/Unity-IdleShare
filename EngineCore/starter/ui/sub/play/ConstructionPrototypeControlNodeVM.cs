@@ -50,7 +50,7 @@ namespace hundun.idleshare.enginecore
                 int y = int.Parse(yInputField.text);
                 //GridPosition position = parent.game.idleGameplayExport.getConnectedRandonPosition();
                 GridPosition position = new GridPosition(x, y);
-                parent.game.idleGameplayExport.gameplayContext.constructionManager.buyInstanceOfPrototypeAndNotify(model.prototypeId, position);
+                parent.game.idleGameplayExport.gameplayContext.constructionManager.buyInstanceOfPrototype(model.prototypeId, position);
             });
 
             background.sprite = parent.game.textureManager.defaultBoardNinePatchTexture;
