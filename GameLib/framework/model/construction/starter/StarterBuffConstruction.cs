@@ -6,27 +6,18 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public class BaseBuffConstruction : BaseConstruction
+    public class StarterBuffConstruction : BaseConstruction
     {
         private readonly String buffId;
 
-        public BaseBuffConstruction(String prototypeId, String id, String buffId) : base(prototypeId, id)
+        public StarterBuffConstruction(String prototypeId, String id, String buffId) : base(prototypeId, id)
         {
             this.buffId = buffId;
         }
 
-        override public void onLogicFrame()
+        override public void onSubLogicFrame()
         {
             // do nothing
-        }
-
-        override public void onClick()
-        {
-            if (!canUpgrade())
-            {
-                return;
-            }
-            doEnhanceBuff();
         }
 
         private void doEnhanceBuff()
@@ -38,10 +29,6 @@ namespace hundun.idleshare.gamelib
             updateModifiedValues();
         }
 
-        override public Boolean canClickEffect()
-        {
-            return canUpgrade();
-        }
 
         public override long calculateModifiedOutputGain(long baseValue, int level, int proficiency)
         {

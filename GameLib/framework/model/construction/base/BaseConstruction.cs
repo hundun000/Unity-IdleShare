@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public abstract class BaseConstruction : ILogicFrameListener, IBuffChangeListener, ITileNode<BaseConstruction>
+    public abstract class BaseConstruction : IBuffChangeListener, ITileNode<BaseConstruction>
     {
         public int maxProficiency = 100;
         public int upgradeLostProficiency = 0;
@@ -103,10 +103,6 @@ namespace hundun.idleshare.gamelib
             this.id = id;
         }
 
-        public abstract void onClick();
-
-        public abstract Boolean canClickEffect();
-
         //protected abstract long calculateModifiedUpgradeCost(long baseValue, int level);
         public abstract long calculateModifiedOutputGain(long baseValue, int level, int proficiency);
         public abstract long calculateModifiedOutputCost(long baseValue, int level, int proficiency);
@@ -145,7 +141,7 @@ namespace hundun.idleshare.gamelib
         }
 
        
-        public void onBuffChange()
+        void IBuffChangeListener.onBuffChange()
         {
             updateModifiedValues();
         }
@@ -156,11 +152,11 @@ namespace hundun.idleshare.gamelib
             // default do nothing
         }
 
-        protected Boolean canOutput()
+        public Boolean canOutput()
         {
             return outputComponent.canOutput();
         }
-        protected void doOutput()
+        public void doOutput()
         {
             if (outputComponent.hasCost())
             {
@@ -205,11 +201,6 @@ namespace hundun.idleshare.gamelib
             return destoryCostPack != null && gameContext.storageManager.isEnough(destoryCostPack.modifiedValues);
         }
 
-        public String getSaveDataKey()
-        {
-            return id;
-        }
-
-        public abstract void onLogicFrame();
+        public abstract void onSubLogicFrame();
     }
 }

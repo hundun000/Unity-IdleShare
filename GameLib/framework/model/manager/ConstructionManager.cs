@@ -73,7 +73,7 @@ namespace hundun.idleshare.gamelib
             foreach (KeyValuePair<String, BaseConstruction> entry in runningConstructionModelMap)
             {
                 var construction = entry.Value;
-                construction.onLogicFrame();
+                construction.onSubLogicFrame();
 
                 if (construction.proficiencyComponent.canPromote())
                 {

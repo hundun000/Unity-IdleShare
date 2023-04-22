@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public class BaseAutoConstruction : BaseConstruction
+    public class StarterAutoConstruction : BaseConstruction
     {
         protected int autoOutputProgress = 0;
 
 
-        public BaseAutoConstruction(String prototypeId, String id
+        public StarterAutoConstruction(String prototypeId, String id
                 ) : base(prototypeId, id)
         {
         }
@@ -27,23 +27,7 @@ namespace hundun.idleshare.gamelib
             gameContext.frontend.log(this.id, "getUpgradeCost=[" + builder.ToString() + "]");
         }
 
-
-        override public void onClick()
-        {
-            if (!canClickEffect())
-            {
-                return;
-            }
-            doUpgrade();
-        }
-
-        override public Boolean canClickEffect()
-        {
-            return canUpgrade();
-        }
-
-
-        override public void onLogicFrame()
+        override public void onSubLogicFrame()
         {
             autoOutputProgress++;
             int logicFrameCountMax = outputComponent.autoOutputSecondCountMax * gameContext.LOGIC_FRAME_PER_SECOND;

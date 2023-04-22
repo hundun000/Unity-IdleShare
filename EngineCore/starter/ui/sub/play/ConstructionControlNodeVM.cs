@@ -69,7 +69,7 @@ namespace hundun.idleshare.enginecore
             clickEffectButton.button.onClick.AddListener(() => {
             
                 parent.game.frontend.log(this.getClass().getSimpleName(), "clickEffectButton clicked");
-                model.onClick();
+                model.doOutput();
 
             });
             destoryButton.button.onClick.AddListener(() => {
@@ -173,7 +173,7 @@ namespace hundun.idleshare.enginecore
             destoryButton.label.text = (model.descriptionPackage.destroyButtonDescroption);
 
             // ------ update clickable-state ------
-            if (model.canClickEffect())
+            if (model.canOutput())
             {
                 clickEffectButton.button.interactable = (true);
             }
