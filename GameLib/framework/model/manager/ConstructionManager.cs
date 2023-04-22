@@ -152,6 +152,10 @@ namespace hundun.idleshare.gamelib
         internal void transformInstanceAndNotify(String id)
         {
             BaseConstruction construction = runningConstructionModelMap[id];
+            if (construction.upgradeComponent.transformCostPack != null)
+            {
+                gameContext.storageManager.modifyAllResourceNum(construction.upgradeComponent.transformCostPack.modifiedValues, false);
+            }
             removeInstance(construction);
             createInstanceOfPrototype(construction.upgradeComponent.transformConstructionPrototypeId, construction.position);
             gameContext.eventManager.notifyConstructionCollectionChange();
