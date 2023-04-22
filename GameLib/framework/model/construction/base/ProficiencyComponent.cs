@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public class ProficiencyComponent
+    public abstract class ProficiencyComponent
     {
-        private readonly BaseConstruction construction;
+
+        public int maxProficiency = 100;
+        protected readonly BaseConstruction construction;
         public String promoteConstructionPrototypeId;
         public String demoteConstructionPrototypeId;
 
@@ -20,13 +22,13 @@ namespace hundun.idleshare.gamelib
 
         public String getProficiencyDescroption()
         {
-            Boolean reachMaxLevel = construction.saveData.proficiency >= construction.maxProficiency;
+            Boolean reachMaxLevel = construction.saveData.proficiency >= this.maxProficiency;
             return construction.descriptionPackage.proficiencyDescroptionProvider.Invoke(construction.saveData.proficiency, reachMaxLevel);
         }
 
         public Boolean canPromote()
         {
-            return (construction.saveData.proficiency >= construction.maxProficiency) && promoteConstructionPrototypeId != null;
+            return isMaxProficiency() && promoteConstructionPrototypeId != null;
         }
 
         public Boolean canDemote()
@@ -36,7 +38,7 @@ namespace hundun.idleshare.gamelib
 
         public void changeProficiency(int delta)
         {
-            construction.saveData.proficiency = Math.Max(0, Math.Min(construction.saveData.proficiency + delta, construction.maxProficiency));
+            construction.saveData.proficiency = Math.Max(0, Math.Min(construction.saveData.proficiency + delta, this.maxProficiency));
             construction.updateModifiedValues();
             //construction.gameContext.frontend.log(construction.name, "changeProficiency delta = " + delta + ", success to " + construction.saveData.proficiency);
         }
@@ -46,8 +48,17 @@ namespace hundun.idleshare.gamelib
 
             construction.saveData.proficiency = 0;
             construction.updateModifiedValues();
-            construction.gameContext.frontend.log(construction.name, "cleanProficiency");
+            construction.gameplayContext.frontend.log(construction.name, "cleanProficiency");
 
+        }
+
+        internal abstract void onSubLogicFrame();
+
+        internal abstract void afterUpgrade();
+
+        internal bool isMaxProficiency()
+        {
+            return construction.saveData.proficiency >= maxProficiency;
         }
     }
 }

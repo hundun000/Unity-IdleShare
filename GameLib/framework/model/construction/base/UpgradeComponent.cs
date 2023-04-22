@@ -61,8 +61,9 @@ namespace hundun.idleshare.gamelib
                 transformCostPack.descriptionStart = construction.descriptionPackage.transformCostDescriptionStart;
             }
         }
-        public void updateModifiedValues(Boolean reachMaxLevel)
+        public void updateModifiedValues()
         {
+            Boolean reachMaxLevel = construction.levelComponent.isReachMaxLevel();
             if (upgradeCostPack != null)
             {
                 if (reachMaxLevel)
@@ -111,32 +112,46 @@ namespace hundun.idleshare.gamelib
 
         public Boolean canUpgrade()
         {
-            if (construction.saveData.level >= construction.maxLevel || upgradeCostPack == null)
+            if (construction.levelComponent.isReachMaxLevel() || upgradeCostPack == null)
             {
                 return false;
             }
-            if (construction.saveData.proficiency < construction.maxProficiency)
+            if (!construction.proficiencyComponent.isMaxProficiency())
             {
                 return false;
             }
 
             List<ResourcePair> compareTarget = upgradeCostPack.modifiedValues;
-            return construction.gameContext.storageManager.isEnough(compareTarget);
+            return construction.gameplayContext.storageManager.isEnough(compareTarget);
+        }
+
+        public void doUpgrade()
+        {
+            List<ResourcePair> upgradeCostRule = this.upgradeCostPack.modifiedValues;
+            construction.gameplayContext.storageManager.modifyAllResourceNum(upgradeCostRule, false);
+            construction.saveData.level = (construction.saveData.level + 1);
+            if (!construction.levelComponent.workingLevelChangable)
+            {
+                construction.saveData.workingLevel = (construction.saveData.level);
+            }
+            construction.proficiencyComponent.afterUpgrade();
+            construction.updateModifiedValues();
+            construction.gameplayContext.eventManager.notifyConstructionCollectionChange();
         }
 
         public Boolean canTransfer()
         {
-            if (construction.saveData.level != construction.maxLevel || transformCostPack == null)
+            if (!construction.levelComponent.isReachMaxLevel() || transformCostPack == null)
             {
                 return false;
             }
-            if (construction.saveData.proficiency < construction.maxProficiency)
+            if (!construction.proficiencyComponent.isMaxProficiency())
             {
                 return false;
             }
 
             List<ResourcePair> compareTarget = transformCostPack.modifiedValues;
-            return construction.gameContext.storageManager.isEnough(compareTarget);
+            return construction.gameplayContext.storageManager.isEnough(compareTarget);
         }
     }
 }

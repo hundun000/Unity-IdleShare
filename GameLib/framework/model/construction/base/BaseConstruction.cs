@@ -9,24 +9,10 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public abstract class BaseConstruction : IBuffChangeListener, ITileNode<BaseConstruction>
+    public abstract class BaseConstruction : ITileNode<BaseConstruction>
     {
-        public int maxProficiency = 100;
-        public int upgradeLostProficiency = 0;
-        internal bool allowAnyProficiencyDestory = true;
 
-        public static readonly int DEFAULT_MAX_LEVEL = 5;
-        public int maxLevel = DEFAULT_MAX_LEVEL;
-
-        public static readonly int DEFAULT_MAX_DRAW_NUM = 5;
-        public int maxDrawNum = DEFAULT_MAX_DRAW_NUM;
-
-        public static readonly int DEFAULT_MIN_WORKING_LEVEL = 0;
-        public int minWorkingLevel = DEFAULT_MIN_WORKING_LEVEL;
-
-        protected Random random = new Random();
-
-        public IdleGameplayContext gameContext;
+        public IdleGameplayContext gameplayContext;
 
         /**
          * NotNull
@@ -43,14 +29,7 @@ namespace hundun.idleshare.gamelib
 
         public DescriptionPackage descriptionPackage;
 
-        /**
-        * Nullable
-        */
-        public ResourcePack destoryCostPack;
-        /**
-        * Nullable
-        */
-        public ResourcePack destoryGainPack;
+
         /**
          * NotNull
          */
@@ -72,6 +51,11 @@ namespace hundun.idleshare.gamelib
          */
         public ProficiencyComponent proficiencyComponent;
 
+        /**
+         * NotNull
+         */
+        public ExistenceComponent existenceComponent;
+
         private Dictionary<TileNeighborDirection, BaseConstruction> _neighbors;
         internal bool allowPositionOverwrite = false;
 
@@ -80,18 +64,15 @@ namespace hundun.idleshare.gamelib
 
         public void lazyInitDescription(IdleGameplayContext gameContext, Language language)
         {
-            this.gameContext = gameContext;
+            this.gameplayContext = gameContext;
 
             this.name = gameContext.gameDictionary.constructionPrototypeIdToShowName(language, prototypeId);
             this.detailDescroptionConstPart = gameContext.gameDictionary.constructionPrototypeIdToDetailDescroptionConstPart(language, prototypeId);
 
             outputComponent.lazyInitDescription();
             upgradeComponent.lazyInitDescription();
-            if (destoryGainPack != null)
-            {
-                this.destoryGainPack.descriptionStart = descriptionPackage.destroyGainDescriptionStart;
-                this.destoryCostPack.descriptionStart = descriptionPackage.destroyCostDescriptionStart;
-            }
+            existenceComponent.lazyInitDescription();
+            
 
             updateModifiedValues();
         }
@@ -103,10 +84,6 @@ namespace hundun.idleshare.gamelib
             this.id = id;
         }
 
-        //protected abstract long calculateModifiedUpgradeCost(long baseValue, int level);
-        public abstract long calculateModifiedOutputGain(long baseValue, int level, int proficiency);
-        public abstract long calculateModifiedOutputCost(long baseValue, int level, int proficiency);
-
 
 
         /**
@@ -116,91 +93,19 @@ namespace hundun.idleshare.gamelib
         {
             //gameContext.frontend.log(this.name, "updateCurrentCache called");
             // --------------
-            Boolean reachMaxLevel = this.saveData.level == this.maxLevel;
-            upgradeComponent.updateModifiedValues(reachMaxLevel);
+            
+            upgradeComponent.updateModifiedValues();
             outputComponent.updateModifiedValues();
-
-            if (destoryGainPack != null)
-            {
-                destoryCostPack.modifiedValues = destoryCostPack.baseValues;
-                destoryCostPack.modifiedValuesDescription = (String.Join(", ",
-                        destoryCostPack.modifiedValues
-                                .Select(pair => pair.type + "x" + pair.amount)
-                                .ToList())
-                                + "; "
-                );
-                destoryGainPack.modifiedValues = destoryGainPack.baseValues;
-                destoryGainPack.modifiedValuesDescription = (String.Join(", ",
-                        destoryGainPack.modifiedValues
-                                .Select(pair => pair.type + "x" + pair.amount)
-                                .ToList())
-                                + "; "
-                );
-            }
+            existenceComponent.updateModifiedValues();
+            
 
         }
 
-       
-        void IBuffChangeListener.onBuffChange()
+
+        public void onSubLogicFrame()
         {
-            updateModifiedValues();
+            outputComponent.onSubLogicFrame();
+            proficiencyComponent.onSubLogicFrame();
         }
-
-
-        virtual protected void printDebugInfoAfterConstructed()
-        {
-            // default do nothing
-        }
-
-        public Boolean canOutput()
-        {
-            return outputComponent.canOutput();
-        }
-        public void doOutput()
-        {
-            if (outputComponent.hasCost())
-            {
-                gameContext.storageManager.modifyAllResourceNum(outputComponent.outputCostPack.modifiedValues, false);
-            }
-            if (outputComponent.outputGainPack != null)
-            {
-                gameContext.storageManager.modifyAllResourceNum(outputComponent.outputGainPack.modifiedValues, true);
-            }
-        }
-
-        public Boolean canUpgrade()
-        {
-            return upgradeComponent.canUpgrade();
-        }
-
-        public Boolean canTransfer()
-        {
-            return upgradeComponent.canTransfer();
-        }
-
-        public void doUpgrade()
-        {
-            List<ResourcePair> upgradeCostRule = upgradeComponent.upgradeCostPack.modifiedValues;
-            gameContext.storageManager.modifyAllResourceNum(upgradeCostRule, false);
-            saveData.level = (saveData.level + 1);
-            if (!levelComponent.workingLevelChangable)
-            {
-                saveData.workingLevel = (saveData.level);
-            }
-            saveData.proficiency -= upgradeLostProficiency;
-            updateModifiedValues();
-            gameContext.eventManager.notifyConstructionCollectionChange();
-        }
-
-        public Boolean canDestory() 
-        {
-            if (!allowAnyProficiencyDestory && this.saveData.proficiency < this.maxProficiency)
-            {
-                return false;
-            }
-            return destoryCostPack != null && gameContext.storageManager.isEnough(destoryCostPack.modifiedValues);
-        }
-
-        public abstract void onSubLogicFrame();
     }
 }

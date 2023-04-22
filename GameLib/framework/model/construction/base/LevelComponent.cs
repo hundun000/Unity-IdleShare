@@ -12,7 +12,10 @@ namespace hundun.idleshare.gamelib
         private readonly BaseConstruction construction;
 
         public readonly Boolean workingLevelChangable;
-
+        public static readonly int DEFAULT_MIN_WORKING_LEVEL = 0;
+        public int minWorkingLevel = DEFAULT_MIN_WORKING_LEVEL;
+        public static readonly int DEFAULT_MAX_LEVEL = 5;
+        public int maxLevel = DEFAULT_MAX_LEVEL;
         public LevelComponent(BaseConstruction construction, Boolean workingLevelChangable)
         {
             this.construction = construction;
@@ -21,7 +24,7 @@ namespace hundun.idleshare.gamelib
 
         public String getWorkingLevelDescroption()
         {
-            Boolean reachMaxLevel = construction.saveData.level == construction.maxLevel;
+            Boolean reachMaxLevel = construction.saveData.level == this.maxLevel;
             return construction.descriptionPackage.levelDescroptionProvider.Invoke(construction.saveData.level, construction.saveData.workingLevel, reachMaxLevel);
         }
 
@@ -32,7 +35,7 @@ namespace hundun.idleshare.gamelib
                 return false;
             }
             int next = construction.saveData.workingLevel + delta;
-            if (next > construction.saveData.level || next < construction.minWorkingLevel)
+            if (next > construction.saveData.level || next < this.minWorkingLevel)
             {
                 return false;
             }
@@ -45,12 +48,17 @@ namespace hundun.idleshare.gamelib
             {
                 construction.saveData.workingLevel = (construction.saveData.workingLevel + delta);
                 construction.updateModifiedValues();
-                construction.gameContext.frontend.log(construction.name, "changeWorkingLevel delta = " + delta + ", success to " + construction.saveData.workingLevel);
+                construction.gameplayContext.frontend.log(construction.name, "changeWorkingLevel delta = " + delta + ", success to " + construction.saveData.workingLevel);
             }
             else
             {
-                construction.gameContext.frontend.log(construction.name, "changeWorkingLevel delta = " + delta + ", but cannot!");
+                construction.gameplayContext.frontend.log(construction.name, "changeWorkingLevel delta = " + delta + ", but cannot!");
             }
+        }
+
+        internal bool isReachMaxLevel()
+        {
+            return construction.saveData.level >= this.maxLevel;
         }
     }
 }

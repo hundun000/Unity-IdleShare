@@ -161,24 +161,7 @@ namespace hundun.idleshare.gamelib
             gameContext.eventManager.notifyConstructionCollectionChange();
         }
 
-        internal void destoryInstanceAndNotify(String id, String constructionPrototypeIdOfEmpty)
-        {
-            BaseConstruction construction = runningConstructionModelMap[id];
-            removeInstance(construction);
-            if (construction.destoryCostPack != null)
-            {
-                gameContext.storageManager.modifyAllResourceNum(construction.destoryCostPack.modifiedValues, false);
-            }
-            if (construction.destoryGainPack != null)
-            {
-                gameContext.storageManager.modifyAllResourceNum(construction.destoryGainPack.modifiedValues, true);
-            }
-            if (constructionPrototypeIdOfEmpty != null)
-            {
-                createInstanceOfPrototype(constructionPrototypeIdOfEmpty, construction.position);
-            }
-            gameContext.eventManager.notifyConstructionCollectionChange();
-        }
+        
 
         private void removeInstanceAt(GridPosition position)
         {
@@ -194,7 +177,7 @@ namespace hundun.idleshare.gamelib
         }
 
 
-        private void removeInstance(BaseConstruction construction)
+        public void removeInstance(BaseConstruction construction)
         {
             runningConstructionModelMap.Remove(construction.id);
             TileNodeUtils.updateNeighborsAllStep(construction, this);
@@ -237,7 +220,7 @@ namespace hundun.idleshare.gamelib
             this.gameContext.eventManager.notifyConstructionCollectionChange();
         }
 
-        private void createInstanceOfPrototype(string prototypeId, GridPosition position)
+        public void createInstanceOfPrototype(string prototypeId, GridPosition position)
         {
             removeInstanceAt(position);
             

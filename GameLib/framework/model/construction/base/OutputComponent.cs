@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace hundun.idleshare.gamelib
 {
-    public class OutputComponent
+    public abstract class OutputComponent
     {
-        private readonly BaseConstruction construction;
+        protected readonly BaseConstruction construction;
 
         /**
          * 对于Click型，即为基础点击收益；对于Auto型，即为基础自动收益；
@@ -51,7 +51,7 @@ namespace hundun.idleshare.gamelib
                 outputGainPack.modifiedValues = (
                         outputGainPack.baseValues
                                 .Select(pair => {
-                                    long newAmout = construction.calculateModifiedOutputGain(pair.amount, 
+                                    long newAmout = this.calculateModifiedOutputGain(pair.amount, 
                                         construction.saveData.workingLevel,
                                         construction.saveData.proficiency
                                         );
@@ -72,7 +72,7 @@ namespace hundun.idleshare.gamelib
                     outputCostPack.modifiedValues = (
                         outputCostPack.baseValues
                                 .Select(pair => {
-                                    long newAmout = construction.calculateModifiedOutputGain(pair.amount, 
+                                    long newAmout = this.calculateModifiedOutputGain(pair.amount, 
                                         construction.saveData.workingLevel,
                                         construction.saveData.proficiency);
                                     return new ResourcePair(pair.type, newAmout);
@@ -101,7 +101,23 @@ namespace hundun.idleshare.gamelib
             }
 
             List<ResourcePair> compareTarget = outputCostPack.modifiedValues;
-            return construction.gameContext.storageManager.isEnough(compareTarget);
+            return construction.gameplayContext.storageManager.isEnough(compareTarget);
         }
+
+        public void doOutput()
+        {
+            if (this.hasCost())
+            {
+                construction.gameplayContext.storageManager.modifyAllResourceNum(this.outputCostPack.modifiedValues, false);
+            }
+            if (this.outputGainPack != null)
+            {
+                construction.gameplayContext.storageManager.modifyAllResourceNum(this.outputGainPack.modifiedValues, true);
+            }
+        }
+
+        public abstract void onSubLogicFrame();
+        public abstract long calculateModifiedOutputGain(long baseValue, int level, int proficiency);
+        public abstract long calculateModifiedOutputCost(long baseValue, int level, int proficiency);
     }
 }

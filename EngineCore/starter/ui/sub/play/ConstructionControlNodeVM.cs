@@ -69,13 +69,13 @@ namespace hundun.idleshare.enginecore
             clickEffectButton.button.onClick.AddListener(() => {
             
                 parent.game.frontend.log(this.getClass().getSimpleName(), "clickEffectButton clicked");
-                model.doOutput();
+                model.outputComponent.doOutput();
 
             });
             destoryButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "destoryButton clicked");
-                parent.game.idleGameplayExport.gameplayContext.constructionManager.destoryInstanceAndNotify(model.id, null);
+                model.existenceComponent.destoryInstanceAndNotify(null);
 
             });
             transformButton.button.onClick.AddListener(() => {
@@ -173,7 +173,7 @@ namespace hundun.idleshare.enginecore
             destoryButton.label.text = (model.descriptionPackage.destroyButtonDescroption);
 
             // ------ update clickable-state ------
-            if (model.canOutput())
+            if (model.outputComponent.canOutput())
             {
                 clickEffectButton.button.interactable = (true);
             }
@@ -181,7 +181,7 @@ namespace hundun.idleshare.enginecore
             {
                 clickEffectButton.button.interactable = (false);
             }
-            if (model.canDestory())
+            if (model.existenceComponent.canDestory())
             {
                 destoryButton.button.interactable = (true);
             }
