@@ -225,11 +225,12 @@ namespace hundun.idleshare.gamelib
 
         
 
-        internal void buyInstanceOfPrototype(string prototypeId, GridPosition position)
+        internal void buyInstanceOfPrototypeAndNotify(string prototypeId, GridPosition position)
         {
             AbstractConstructionPrototype prototype = gameContext.constructionFactory.getPrototype(prototypeId);
             this.gameContext.storageManager.modifyAllResourceNum(prototype.buyInstanceCostPack.modifiedValues, false);
-            createInstanceOfPrototype(prototypeId, position);   
+            createInstanceOfPrototype(prototypeId, position);
+            this.gameContext.eventManager.notifyConstructionCollectionChange();
         }
 
         private void createInstanceOfPrototype(string prototypeId, GridPosition position)

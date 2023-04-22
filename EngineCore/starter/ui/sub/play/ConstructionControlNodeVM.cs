@@ -69,19 +69,19 @@ namespace hundun.idleshare.enginecore
             clickEffectButton.button.onClick.AddListener(() => {
             
                 parent.game.frontend.log(this.getClass().getSimpleName(), "clickEffectButton clicked");
-                parent.game.idleGameplayExport.constructionOnClick(model.id);
+                model.onClick();
 
             });
             destoryButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "destoryButton clicked");
-                parent.game.idleGameplayExport.destoryConstruction(model.id, null);
+                parent.game.idleGameplayExport.gameplayContext.constructionManager.destoryInstanceAndNotify(model.id, null);
 
             });
             transformButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "transformButton clicked");
-                parent.game.idleGameplayExport.transformConstruction(model.id);
+                parent.game.idleGameplayExport.gameplayContext.constructionManager.transformInstanceAndNotify(model.id);
 
             });
 
@@ -89,7 +89,7 @@ namespace hundun.idleshare.enginecore
             // ------ changeWorkingLevelGroup ------
             downWorkingLevelButton.button.onClick.AddListener(() => {
                 parent.game.frontend.log(this.getClass().getSimpleName(), "level down clicked");
-                parent.game.idleGameplayExport.constructionChangeWorkingLevel(model.id, -1);
+                model.levelComponent.changeWorkingLevel(-1);
             });
 
 
@@ -97,7 +97,7 @@ namespace hundun.idleshare.enginecore
             upWorkingLevelButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "level up clicked");
-                parent.game.idleGameplayExport.constructionChangeWorkingLevel(model.id, 1);
+                model.levelComponent.changeWorkingLevel(1);
 
             });
 
@@ -198,7 +198,7 @@ namespace hundun.idleshare.enginecore
                 transformButton.button.interactable = (false);
             }
 
-            Boolean canUpWorkingLevel = parent.game.idleGameplayExport.constructionCanChangeWorkingLevel(model.id, 1);
+            Boolean canUpWorkingLevel = model.levelComponent.canChangeWorkingLevel(1);
             if (canUpWorkingLevel)
             {
                 upWorkingLevelButton.button.interactable = (true);
@@ -208,7 +208,7 @@ namespace hundun.idleshare.enginecore
                 upWorkingLevelButton.button.interactable = (false);
             }
 
-            Boolean canDownWorkingLevel = parent.game.idleGameplayExport.constructionCanChangeWorkingLevel(model.id, -1);
+            Boolean canDownWorkingLevel = model.levelComponent.canChangeWorkingLevel(-1);
             if (canDownWorkingLevel)
             {
                 downWorkingLevelButton.button.interactable = (true);

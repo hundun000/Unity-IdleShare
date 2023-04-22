@@ -114,12 +114,12 @@ namespace hundun.idleshare.enginecore
 
             //gameAreaChangeListeners.Add(screenBackgroundVM);
 
-            this.game.idleGameplayExport.eventManagerRegisterListener(this);
+            this.game.idleGameplayExport.gameplayContext.eventManager.registerListener(this);
         }
 
         virtual protected void dispose()
         {
-            this.game.idleGameplayExport.eventManagerUnregisterListener(this);
+            this.game.idleGameplayExport.gameplayContext.eventManager.unregisterListener(this);
         }
 
 

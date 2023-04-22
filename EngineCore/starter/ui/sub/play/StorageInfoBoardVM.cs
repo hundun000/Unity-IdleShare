@@ -68,15 +68,15 @@ namespace hundun.idleshare.enginecore
 
         private void updateViewData()
         {
-            Boolean needRebuildCells = !shownTypes.Equals(parent.game.idleGameplayExport.getUnlockedResourceTypes());
+            Boolean needRebuildCells = !shownTypes.Equals(parent.game.idleGameplayExport.gameplayContext.storageManager.unlockedResourceTypes);
             if (needRebuildCells)
             {
                 shownTypes.Clear();
-                shownTypes.AddRange(parent.game.idleGameplayExport.getUnlockedResourceTypes());
+                shownTypes.AddRange(parent.game.idleGameplayExport.gameplayContext.storageManager.unlockedResourceTypes);
                 rebuildCells();
             }
             nodes.ForEach(
-                node => node.update(parent.game.idleGameplayExport.getResourceNumOrZero(node.getResourceType()))
+                node => node.update(parent.game.idleGameplayExport.gameplayContext.storageManager.getResourceNumOrZero(node.getResourceType()))
                 );
         }
 

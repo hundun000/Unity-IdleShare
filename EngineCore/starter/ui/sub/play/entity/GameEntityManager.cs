@@ -113,7 +113,7 @@ namespace hundun.idleshare.enginecore
 
         private void checkResourceEntityByOwnAmount(String resourceId, BaseGameEntityFactory<T_GAME, T_SAVE> gameEntityFactory)
         {
-            long resourceNum = game.idleGameplayExport.getResourceNumOrZero(resourceId);
+            long resourceNum = game.idleGameplayExport.gameplayContext.storageManager.getResourceNumOrZero(resourceId);
             int drawNum = gameEntityFactory.calculateResourceDrawNum(resourceId, resourceNum);
 
             gameEntitiesOfResourceIds.computeIfAbsent(resourceId, k => new List<GameEntity>());
@@ -163,7 +163,7 @@ namespace hundun.idleshare.enginecore
 
         private void checkConstructionEntityByOwnAmount(String prototypeId, BaseGameEntityFactory<T_GAME, T_SAVE> gameEntityFactory)
         {
-            var constructions = game.idleGameplayExport.getConstructionsOfPrototype(prototypeId);
+            var constructions = game.idleGameplayExport.gameplayContext.constructionManager.getConstructionsOfPrototype(prototypeId);
             int resourceNum = constructions.Select(it => it.saveData.workingLevel).Sum();
             int MAX_DRAW_NUM = 5;
             int drawNum = gameEntityFactory.calculateConstructionDrawNum(prototypeId, resourceNum, MAX_DRAW_NUM);
