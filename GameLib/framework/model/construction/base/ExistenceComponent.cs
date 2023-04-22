@@ -67,17 +67,16 @@ namespace hundun.idleshare.gamelib
             return destoryGainPack != null && destoryCostPack != null && construction.gameplayContext.storageManager.isEnough(destoryCostPack.modifiedValues);
         }
 
-        internal void destoryInstanceAndNotify(String constructionPrototypeIdOfEmpty)
+        internal void doDestory(String constructionPrototypeIdOfEmpty)
         {
-            construction.gameplayContext.constructionManager.removeInstance(construction);
+            construction.gameplayContext.constructionManager.addToRemoveQueue(construction);
             construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryCostPack.modifiedValues, false);
             construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryGainPack.modifiedValues, true);
 
             if (constructionPrototypeIdOfEmpty != null)
             {
-                construction.gameplayContext.constructionManager.createInstanceOfPrototype(constructionPrototypeIdOfEmpty, construction.position);
+                construction.gameplayContext.constructionManager.addToCreateQueue(constructionPrototypeIdOfEmpty, construction.position);
             }
-            construction.gameplayContext.eventManager.notifyConstructionCollectionChange();
         }
 
     }

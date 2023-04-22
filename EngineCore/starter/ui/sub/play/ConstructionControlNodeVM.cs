@@ -75,13 +75,13 @@ namespace hundun.idleshare.enginecore
             destoryButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "destoryButton clicked");
-                model.existenceComponent.destoryInstanceAndNotify(null);
+                model.existenceComponent.doDestory(null);
 
             });
             transformButton.button.onClick.AddListener(() => {
 
                 parent.game.frontend.log(this.getClass().getSimpleName(), "transformButton clicked");
-                parent.game.idleGameplayExport.gameplayContext.constructionManager.transformInstanceAndNotify(model.id);
+                model.upgradeComponent.doTransfer();
 
             });
 

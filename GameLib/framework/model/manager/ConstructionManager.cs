@@ -28,6 +28,9 @@ namespace hundun.idleshare.gamelib
          */
         public Dictionary<String, BaseConstruction> runningConstructionModelMap = new Dictionary<String, BaseConstruction>();
 
+        private List<BaseConstruction> removeQueue = new List<BaseConstruction>();
+        private List<BaseConstruction> createQueue = new List<BaseConstruction>();
+
         /**
          * 根据GameArea显示不同的ConstructionVM集合
          */
@@ -70,23 +73,30 @@ namespace hundun.idleshare.gamelib
             List<BaseConstruction> promoteList = new List<BaseConstruction>();
             List<BaseConstruction> demoteList = new List<BaseConstruction>();
 
+            removeQueue.ForEach(it => {
+                runningConstructionModelMap.Remove(it.id);
+                TileNodeUtils.updateNeighborsAllStep(it, this);
+            });
+
+            createQueue.ForEach(it => {
+                removeInstanceAt(it.position);
+                runningConstructionModelMap.put(it.id, it);
+                TileNodeUtils.updateNeighborsAllStep(it, this);
+            });
+
+            if (removeQueue.Count > 0 || createQueue.Count > 0)
+            {
+                this.gameContext.eventManager.notifyConstructionCollectionChange();
+            }
+            removeQueue.Clear();
+            createQueue.Clear();
+
             foreach (KeyValuePair<String, BaseConstruction> entry in runningConstructionModelMap)
             {
                 var construction = entry.Value;
                 construction.onSubLogicFrame();
-
-                if (construction.proficiencyComponent.canPromote())
-                {
-                    promoteList.Add(construction);
-                } 
-                else if (construction.proficiencyComponent.canDemote())
-                {
-                    demoteList.Add(construction);
-                }
             }
 
-            promoteList.ForEach(it => promoteInstanceAndNotify(it.id));
-            demoteList.ForEach(it => demoteInstanceAndNotify(it.id));
         }
 
         public List<BaseConstruction> getAreaControlableConstructionsOrEmpty(String gameArea)
@@ -133,54 +143,24 @@ namespace hundun.idleshare.gamelib
                 .ToList();
         }
 
-        internal void promoteInstanceAndNotify(String id)
-        {
-            BaseConstruction construction = runningConstructionModelMap[id];
-            removeInstance(construction);
-            createInstanceOfPrototype(construction.proficiencyComponent.promoteConstructionPrototypeId, construction.position);
-            gameContext.eventManager.notifyConstructionCollectionChange();
-        }
+        
 
-        internal void demoteInstanceAndNotify(String id)
-        {
-            BaseConstruction construction = runningConstructionModelMap[id];
-            removeInstance(construction);
-            createInstanceOfPrototype(construction.proficiencyComponent.demoteConstructionPrototypeId, construction.position);
-            gameContext.eventManager.notifyConstructionCollectionChange();
-        }
-
-        internal void transformInstanceAndNotify(String id)
-        {
-            BaseConstruction construction = runningConstructionModelMap[id];
-            if (construction.upgradeComponent.transformCostPack != null)
-            {
-                gameContext.storageManager.modifyAllResourceNum(construction.upgradeComponent.transformCostPack.modifiedValues, false);
-            }
-            removeInstance(construction);
-            createInstanceOfPrototype(construction.upgradeComponent.transformConstructionPrototypeId, construction.position);
-            gameContext.eventManager.notifyConstructionCollectionChange();
-        }
 
         
 
         private void removeInstanceAt(GridPosition position)
         {
-            var toRemove = runningConstructionModelMap
+            runningConstructionModelMap
                          .Where(pair => pair.Value.position.Equals(position))
-                         .ToList();
-
-            foreach (var pair in toRemove)
-            {
-                runningConstructionModelMap.Remove(pair.Key);
-                TileNodeUtils.updateNeighborsAllStep(pair.Value, this);
-            }
+                         .ToList()
+                         .ForEach(pair => removeQueue.Add(pair.Value));
+ 
         }
 
 
-        public void removeInstance(BaseConstruction construction)
+        public void addToRemoveQueue(BaseConstruction construction)
         {
-            runningConstructionModelMap.Remove(construction.id);
-            TileNodeUtils.updateNeighborsAllStep(construction, this);
+            removeQueue.Add(construction);
         }
 
         internal void loadInstance(ConstructionSaveData saveData)
@@ -212,24 +192,18 @@ namespace hundun.idleshare.gamelib
 
         
 
-        internal void buyInstanceOfPrototypeAndNotify(string prototypeId, GridPosition position)
+        internal void buyInstanceOfPrototype(string prototypeId, GridPosition position)
         {
             AbstractConstructionPrototype prototype = gameContext.constructionFactory.getPrototype(prototypeId);
             this.gameContext.storageManager.modifyAllResourceNum(prototype.buyInstanceCostPack.modifiedValues, false);
-            createInstanceOfPrototype(prototypeId, position);
-            this.gameContext.eventManager.notifyConstructionCollectionChange();
+            addToCreateQueue(prototypeId, position);
         }
 
-        public void createInstanceOfPrototype(string prototypeId, GridPosition position)
+        public void addToCreateQueue(string prototypeId, GridPosition position)
         {
-            removeInstanceAt(position);
-            
             BaseConstruction construction = gameContext.constructionFactory.getInstanceOfPrototype(prototypeId, position);
-            
-            runningConstructionModelMap.put(construction.id, construction);
-            TileNodeUtils.updateNeighborsAllStep(construction, this);
 
-            
+            createQueue.Add(construction);
         }
 
         
@@ -237,6 +211,11 @@ namespace hundun.idleshare.gamelib
         BaseConstruction ITileNodeMap<BaseConstruction>.getValidNodeOrNull(GridPosition position)
         {
             return getConstructionAt(position);
+        }
+
+        internal void AddToRemoveQueue(BaseConstruction construction)
+        {
+            throw new NotImplementedException();
         }
     }
 }
