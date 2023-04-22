@@ -1,12 +1,8 @@
-﻿using Assets.Scripts.DemoGameCore.logic;
-using hundun.unitygame.adapters;
+﻿using hundun.unitygame.adapters;
 using hundun.unitygame.gamelib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 
 
 namespace hundun.idleshare.gamelib
@@ -71,6 +67,11 @@ namespace hundun.idleshare.gamelib
         public void eventManagerRegisterListener(Object objecz)
         {
             gameplayContext.eventManager.registerListener(objecz);
+        }
+
+        internal void eventManagerUnregisterListener(Object objecz)
+        {
+            gameplayContext.eventManager.unregisterListener(objecz);
         }
 
         public HashSet<String> getUnlockedResourceTypes()
@@ -206,5 +207,7 @@ namespace hundun.idleshare.gamelib
             }
             throw new Exception("getConnectedRandonPosition fail");
         }
+
+        
     }
 }

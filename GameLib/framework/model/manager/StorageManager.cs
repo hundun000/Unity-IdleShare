@@ -1,4 +1,5 @@
-﻿using hundun.idleshare.gamelib;
+﻿using hundun.idleshare.enginecore;
+using hundun.idleshare.gamelib;
 using hundun.unitygame.adapters;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace Assets.Scripts.Unity_IdleShare.GameLib.framework.model.manager
 
 
         private Dictionary<String, long> oneFrameDeltaResoueces = new Dictionary<String, long>();
+        private Dictionary<String, List<long>> deltaHistoryMap = new();
+        private const int HISTORY_SIZE = 100;
 
         public StorageManager(IdleGameplayContext gameContext)
         {
@@ -83,10 +86,18 @@ namespace Assets.Scripts.Unity_IdleShare.GameLib.framework.model.manager
         public void onSubLogicFrame()
         {
             // ------ frameDeltaAmountClear ------
-            Dictionary<String, long> temp = new Dictionary< String, long> (oneFrameDeltaResoueces);
+            Dictionary<String, long> changeMap = new Dictionary< String, long> (oneFrameDeltaResoueces);
             oneFrameDeltaResoueces.Clear();
-            //Gdx.app.log(this.getClass().getSimpleName(), "frameDeltaAmountClear: " + temp);
-            gameContext.eventManager.notifyOneFrameResourceChange(temp);
+            changeMap.Keys.ToList().ForEach(resourceType => deltaHistoryMap.computeIfAbsent(resourceType, it => new())); 
+            deltaHistoryMap.ToList().ForEach(entry => {
+                var resourceType = entry.Key;
+                entry.Value.Insert(entry.Value.Count, changeMap.getOrDefault(resourceType, 0));
+                while (entry.Value.Count > HISTORY_SIZE)
+                {
+                    entry.Value.RemoveAt(0);
+                }
+            });
+            gameContext.eventManager.notifyOneFrameResourceChange(changeMap, deltaHistoryMap);
         }
     }
 }

@@ -46,6 +46,30 @@ namespace hundun.idleshare.gamelib
             }
         }
 
+        public void unregisterListener(Object listener)
+        {
+            if (listener is IBuffChangeListener)
+            {
+                buffChangeListeners.Remove((IBuffChangeListener)listener);
+            }
+            if (listener is IAchievementUnlockCallback)
+            {
+                achievementUnlockListeners.Remove((IAchievementUnlockCallback)listener);
+            }
+            if (listener is INotificationBoardCallerAndCallback)
+            {
+                notificationBoardCallerAndCallbacks.Remove((INotificationBoardCallerAndCallback)listener);
+            }
+            if (listener is IOneFrameResourceChangeListener)
+            {
+                oneFrameResourceChangeListeners.Remove((IOneFrameResourceChangeListener)listener);
+            }
+            if (listener is IConstructionCollectionListener)
+            {
+                constructionCollectionListeners.Remove((IConstructionCollectionListener)listener);
+            }
+        }
+
         public void notifyBuffChange()
         {
             gameContext.frontend.log(this.getClass().getSimpleName(), "notifyBuffChange");
@@ -62,12 +86,12 @@ namespace hundun.idleshare.gamelib
         //        }
         //    }
 
-        public void notifyOneFrameResourceChange(Dictionary<String, long> changeMap)
+        public void notifyOneFrameResourceChange(Dictionary<String, long> changeMap, Dictionary<string, List<long>> deltaHistoryMap)
         {
             //Gdx.app.log(this.getClass().getSimpleName(), "notifyOneFrameResourceChange");
             foreach (IOneFrameResourceChangeListener listener in oneFrameResourceChangeListeners)
             {
-                listener.onResourceChange(changeMap);
+                listener.onResourceChange(changeMap, deltaHistoryMap);
             }
         }
 

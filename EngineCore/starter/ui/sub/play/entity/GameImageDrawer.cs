@@ -96,15 +96,12 @@ namespace hundun.idleshare.enginecore
             
         }
 
-
-        public void onResourceChange(Dictionary<String, long> changeMap)
+        void IOneFrameResourceChangeListener.onResourceChange(Dictionary<string, long> changeMap, Dictionary<string, List<long>> deltaHistoryMap)
         {
             GameEntityManager<T_GAME, T_SAVE> manager = parent.gameEntityManager;
             String gameArea = parent.area;
             manager.areaEntityCheckByOwnAmount(gameArea, gameEntityFactory);
             manager.areaEntityCheckByChangeAmount(gameArea, gameEntityFactory, changeMap);
         }
-
-
     }
 }

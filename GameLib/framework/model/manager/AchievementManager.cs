@@ -140,18 +140,17 @@ namespace hundun.idleshare.gamelib
             this.achievementQueue = new List<string>(achievementPrototypeIds);
         }
 
-
-        public void onResourceChange(Dictionary<String, long> changeMap)
-        {
-            checkAllAchievementUnlock();
-        }
-
         public void onGameStart()
         {
             checkAllAchievementUnlock();
         }
 
         public void onConstructionCollectionChange()
+        {
+            checkAllAchievementUnlock();
+        }
+
+        void IOneFrameResourceChangeListener.onResourceChange(Dictionary<string, long> changeMap, Dictionary<string, List<long>> deltaHistoryMap)
         {
             checkAllAchievementUnlock();
         }

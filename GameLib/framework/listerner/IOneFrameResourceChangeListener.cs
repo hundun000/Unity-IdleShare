@@ -8,6 +8,6 @@ namespace hundun.idleshare.gamelib
 { 
     public interface IOneFrameResourceChangeListener
     {
-        void onResourceChange(Dictionary<String, long> changeMap);
+        void onResourceChange(Dictionary<String, long> changeMap, Dictionary<string, List<long>> deltaHistoryMap);
     }
 }

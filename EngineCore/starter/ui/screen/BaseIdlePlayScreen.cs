@@ -38,8 +38,8 @@ namespace hundun.idleshare.enginecore
         public String area { get; private set; }
         private String startArea;
 
-        protected List<ILogicFrameListener> logicFrameListeners = new List<ILogicFrameListener>();
-        protected List<IGameAreaChangeListener> gameAreaChangeListeners = new List<IGameAreaChangeListener>();
+        protected List<ILogicFrameListener> logicFrameListeners;
+        protected List<IGameAreaChangeListener> gameAreaChangeListeners;
 
         virtual protected void Awake()
         {
@@ -63,6 +63,9 @@ namespace hundun.idleshare.enginecore
             base.postMonoBehaviourInitialization(game);
             this.startArea = startArea;
             this.logicFrameHelper = new LogicFrameHelper(LOGIC_FRAME_PER_SECOND);
+
+            this.logicFrameListeners = new List<ILogicFrameListener>();
+            this.gameAreaChangeListeners = new List<IGameAreaChangeListener>();
         }
 
         public void setAreaAndNotifyChildren(String current)
@@ -95,6 +98,8 @@ namespace hundun.idleshare.enginecore
             // unity adapter
             game.audioPlayManager.intoScreen(audioSource, this.getClass().getSimpleName());
         }
+
+        protected abstract void dispose();
 
         virtual protected void lazyInitLogicContext()
         {
