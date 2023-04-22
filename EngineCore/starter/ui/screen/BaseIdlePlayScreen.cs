@@ -99,7 +99,7 @@ namespace hundun.idleshare.enginecore
             game.audioPlayManager.intoScreen(audioSource, this.getClass().getSimpleName());
         }
 
-        protected abstract void dispose();
+        
 
         virtual protected void lazyInitLogicContext()
         {
@@ -115,6 +115,11 @@ namespace hundun.idleshare.enginecore
             //gameAreaChangeListeners.Add(screenBackgroundVM);
 
             this.game.idleGameplayExport.eventManagerRegisterListener(this);
+        }
+
+        virtual protected void dispose()
+        {
+            this.game.idleGameplayExport.eventManagerUnregisterListener(this);
         }
 
 
