@@ -52,11 +52,11 @@ namespace hundun.idleshare.gamelib
 
         }
 
-        internal abstract void onSubLogicFrame();
+        public abstract void onSubLogicFrame();
 
-        internal abstract void afterUpgrade();
+        public abstract void afterUpgrade();
 
-        internal bool isMaxProficiency()
+        public bool isMaxProficiency()
         {
             return construction.saveData.proficiency >= maxProficiency;
         }
