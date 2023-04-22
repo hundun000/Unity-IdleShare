@@ -89,7 +89,7 @@ namespace hundun.idleshare.gamelib
             demoteList.ForEach(it => demoteInstanceAndNotify(it.id));
         }
 
-        public List<BaseConstruction> getAreaShownConstructionsOrEmpty(String gameArea)
+        public List<BaseConstruction> getAreaControlableConstructionsOrEmpty(String gameArea)
         {
             return runningConstructionModelMap.Values
                 .Where(it => areaControlableConstructionVMPrototypeIds.ContainsKey(gameArea) && 

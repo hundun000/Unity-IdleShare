@@ -35,7 +35,7 @@ namespace hundun.idleshare.enginecore
 
         public void onConstructionCollectionChange()
         {
-            List<BaseConstruction> newConstructions = parent.game.idleGameplayExport.gameplayContext.constructionManager.getAreaShownConstructionsOrEmpty(parent.area);
+            List<BaseConstruction> newConstructions = parent.game.idleGameplayExport.gameplayContext.constructionManager.getAreaControlableConstructionsOrEmpty(parent.area);
             newConstructions = filterConstructions(newConstructions);
 
             int childrenSize = initChild(newConstructions.size());

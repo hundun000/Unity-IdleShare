@@ -30,19 +30,16 @@ namespace hundun.idleshare.gamelib
 
         internal void lazyInitDescription()
         {
-            if (destoryGainPack != null)
+            if (destoryGainPack != null && destoryCostPack != null)
             {
                 this.destoryGainPack.descriptionStart = construction.descriptionPackage.destroyGainDescriptionStart;
-            }
-            if (destoryCostPack != null)
-            {
                 this.destoryCostPack.descriptionStart = construction.descriptionPackage.destroyCostDescriptionStart;
             }
         }
 
         internal void updateModifiedValues()
         {
-            if (destoryGainPack != null)
+            if (destoryGainPack != null && destoryCostPack != null)
             {
                 destoryCostPack.modifiedValues = destoryCostPack.baseValues;
                 destoryCostPack.modifiedValuesDescription = (String.Join(", ",
@@ -67,20 +64,15 @@ namespace hundun.idleshare.gamelib
             {
                 return false;
             }
-            return destoryCostPack != null && construction.gameplayContext.storageManager.isEnough(destoryCostPack.modifiedValues);
+            return destoryGainPack != null && destoryCostPack != null && construction.gameplayContext.storageManager.isEnough(destoryCostPack.modifiedValues);
         }
 
         internal void destoryInstanceAndNotify(String constructionPrototypeIdOfEmpty)
         {
             construction.gameplayContext.constructionManager.removeInstance(construction);
-            if (construction.existenceComponent.destoryCostPack != null)
-            {
-                construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryCostPack.modifiedValues, false);
-            }
-            if (construction.existenceComponent.destoryGainPack != null)
-            {
-                construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryGainPack.modifiedValues, true);
-            }
+            construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryCostPack.modifiedValues, false);
+            construction.gameplayContext.storageManager.modifyAllResourceNum(construction.existenceComponent.destoryGainPack.modifiedValues, true);
+
             if (constructionPrototypeIdOfEmpty != null)
             {
                 construction.gameplayContext.constructionManager.createInstanceOfPrototype(constructionPrototypeIdOfEmpty, construction.position);
