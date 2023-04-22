@@ -69,18 +69,13 @@ namespace hundun.idleshare.gamelib
         public void onSubLogicFrame()
         {
 
-            // 迭代期间不应修改runningConstructionModelMap
-            List<BaseConstruction> promoteList = new List<BaseConstruction>();
-            List<BaseConstruction> demoteList = new List<BaseConstruction>();
-
-            removeQueue.ForEach(it => {
-                runningConstructionModelMap.Remove(it.id);
+            createQueue.ForEach(it => {
+                runningConstructionModelMap.put(it.id, it);
                 TileNodeUtils.updateNeighborsAllStep(it, this);
             });
 
-            createQueue.ForEach(it => {
-                removeInstanceAt(it.position);
-                runningConstructionModelMap.put(it.id, it);
+            removeQueue.ForEach(it => {
+                runningConstructionModelMap.Remove(it.id);
                 TileNodeUtils.updateNeighborsAllStep(it, this);
             });
 
@@ -148,7 +143,7 @@ namespace hundun.idleshare.gamelib
 
         
 
-        private void removeInstanceAt(GridPosition position)
+        private void addToRemoveQueueAt(GridPosition position)
         {
             runningConstructionModelMap
                          .Where(pair => pair.Value.position.Equals(position))
@@ -196,13 +191,13 @@ namespace hundun.idleshare.gamelib
         {
             AbstractConstructionPrototype prototype = gameContext.constructionFactory.getPrototype(prototypeId);
             this.gameContext.storageManager.modifyAllResourceNum(prototype.buyInstanceCostPack.modifiedValues, false);
+            addToRemoveQueueAt(position);
             addToCreateQueue(prototypeId, position);
         }
 
         public void addToCreateQueue(string prototypeId, GridPosition position)
         {
             BaseConstruction construction = gameContext.constructionFactory.getInstanceOfPrototype(prototypeId, position);
-
             createQueue.Add(construction);
         }
 
